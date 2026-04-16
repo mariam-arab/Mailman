@@ -86,10 +86,8 @@ func _process(delta: float) -> void:
 	# proximity bubble. Replaces the 3D camera-raycast — a side-scroll player
 	# has no aim cursor, so proximity is the natural cue.
 	var target = player.closest_interactable() if player.has_method("closest_interactable") else null
-	if target:
-		hud.set_prompt(target.prompt_text())
-	else:
-		hud.set_prompt("")
+	hud.set_prompt(target.prompt_text() if target else "")
+	hud.set_nearby_interactable(target)
 
 	_update_camera_transform(delta)
 
@@ -118,4 +116,4 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
 		var target = player.closest_interactable() if player.has_method("closest_interactable") else null
 		if target:
-			target.interact(player)
+			hud.open_inspection()

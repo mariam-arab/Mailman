@@ -15,6 +15,7 @@ var _player: Node = null
 var _showing_inspection: bool = false
 var _showing_back: bool = false
 var _cards: Array = []
+var _nearby_interactable = null
 
 var _style_selected: StyleBoxFlat
 var _style_idle: StyleBoxFlat
@@ -57,17 +58,39 @@ func set_prompt(text: String) -> void:
 	prompt_label.text = text
 
 
+func set_nearby_interactable(target) -> void:
+	_nearby_interactable = target
+	if _showing_inspection:
+		_update_pager_hint()
+
+
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("inspect_mail"):
 		_toggle_inspection()
 	elif _showing_inspection:
-		if event.is_action_pressed("flip_letter"):
+		if event.is_action_pressed("interact"):
+			if _nearby_interactable and _player:
+				_nearby_interactable.interact(_player)
+			get_viewport().set_input_as_handled()
+		elif event.is_action_pressed("flip_letter"):
 			_showing_back = not _showing_back
 			_refresh_carousel()
 		elif event.is_action_pressed("next_letter"):
 			GameState.cycle_selection(1)
 		elif event.is_action_pressed("prev_letter"):
 			GameState.cycle_selection(-1)
+
+
+## Opens the carousel from outside (e.g. when the player presses E near a mailbox).
+func open_inspection() -> void:
+	if _showing_inspection or GameState.mail_bag.is_empty():
+		return
+	_showing_inspection = true
+	inspection.visible = true
+	_showing_back = false
+	_rebuild_carousel()
+	if _player and _player.has_method("set_input_active"):
+		_player.set_input_active(false)
 
 
 func _toggle_inspection() -> void:
@@ -102,10 +125,21 @@ func _refresh_carousel() -> void:
 		if i >= bag.size():
 			break
 		_apply_card_state(_cards[i], bag[i], i == sel)
-	if bag.size() > 0:
-		pager_hint.text = "%d / %d   ◀ A   D ▶   R: flip" % [sel + 1, bag.size()]
-	else:
+	_update_pager_hint()
+
+
+func _update_pager_hint() -> void:
+	var bag := GameState.mail_bag
+	if bag.is_empty():
 		pager_hint.text = "Bag empty"
+		return
+	var nav := "%d / %d   ◀ A   D ▶   R: flip" % [GameState.selected_index + 1, bag.size()]
+	if _nearby_interactable and _nearby_interactable.has_method("interact"):
+		var label: String = _nearby_interactable.house_label if "house_label" in _nearby_interactable else ""
+		var dest := "  →  " + label if label else ""
+		pager_hint.text = "E: Deliver%s        %s" % [dest, nav]
+	else:
+		pager_hint.text = "Close (Tab) and walk near a mailbox to deliver        %s" % nav
 
 
 func _apply_card_state(card: Panel, letter, is_selected: bool) -> void:

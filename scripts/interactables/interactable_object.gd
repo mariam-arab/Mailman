@@ -9,6 +9,10 @@ class_name InteractableObject
 @export var enabled: bool = true
 
 
+func _ready() -> void:
+	add_to_group("interactable")
+
+
 ## Short text shown in the bottom-left HUD when the player is looking at this
 ## object. Subclasses should return something like "E: Open mailbox".
 func prompt_text() -> String:

@@ -54,18 +54,20 @@ func _physics_process(delta: float) -> void:
 		global_position.x = locked_x
 
 
-## Returns the closest InteractableObject currently inside the player's
-## interact range, or null if nothing is in reach. Used by the level script to
-## drive the HUD prompt and route E presses.
+## Returns the closest enabled InteractableObject within INTERACT_RANGE units.
+## Uses a group scan instead of Area3D so it works regardless of physics-layer
+## timing or collision-mask mismatches.
+const INTERACT_RANGE := 2.5
 func closest_interactable():
 	var best = null
-	var best_dist := INF
-	for body in interact_range.get_overlapping_bodies():
-		if body is InteractableObject and body.enabled:
-			var d := global_position.distance_to(body.global_position)
-			if d < best_dist:
-				best = body
-				best_dist = d
+	var best_dist := INTERACT_RANGE
+	for node in get_tree().get_nodes_in_group("interactable"):
+		if not (node is InteractableObject) or not node.enabled:
+			continue
+		var d := global_position.distance_to(node.global_position)
+		if d < best_dist:
+			best = node
+			best_dist = d
 	return best
 
 
