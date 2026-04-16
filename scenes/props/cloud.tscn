@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://dubcydii0fs72"]
+
+; A "crumpled paper" cloud — three white spheres at slight Z offsets so the
+; silhouette reads as a lumpy hand-cut shape rather than a clean ball.
+
+[sub_resource type="StandardMaterial3D" id="Material_cloud"]
+albedo_color = Color(0.98, 0.96, 0.92, 1)
+roughness = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_a"]
+radius = 0.9
+height = 1.4
+radial_segments = 10
+rings = 5
+
+[sub_resource type="SphereMesh" id="SphereMesh_b"]
+radius = 1.1
+height = 1.6
+radial_segments = 10
+rings = 5
+
+[sub_resource type="SphereMesh" id="SphereMesh_c"]
+radius = 0.8
+height = 1.2
+radial_segments = 10
+rings = 5
+
+[node name="Cloud" type="Node3D"]
+
+[node name="LobeA" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.4)
+mesh = SubResource("SphereMesh_a")
+surface_material_override/0 = SubResource("Material_cloud")
+
+[node name="LobeB" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+mesh = SubResource("SphereMesh_b")
+surface_material_override/0 = SubResource("Material_cloud")
+
+[node name="LobeC" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 1.4)
+mesh = SubResource("SphereMesh_c")
+surface_material_override/0 = SubResource("Material_cloud")

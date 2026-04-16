@@ -53,6 +53,7 @@ const DAY_ONE_LETTERS := [
 func _ready() -> void:
 	hud.bind_player(player)
 	GameState.start_day(1, _build_day_one_letters())
+	_update_camera_transform(1.0)
 
 
 func _build_day_one_letters() -> Array:
@@ -71,23 +72,50 @@ func _build_day_one_letters() -> Array:
 	return letters
 
 
-func _process(_delta: float) -> void:
-	# Update the HUD prompt based on what the player is looking at. Keeping
-	# this in _process (not signal-driven) is fine — the raycast is cheap and
-	# the prompt should track head movement instantly.
-	var ray: RayCast3D = player.get_node("Camera3D/InteractionRay")
-	if ray.is_colliding():
-		var hit = ray.get_collider()
-		if hit and hit is InteractableObject and hit.enabled:
-			hud.set_prompt(hit.prompt_text())
-			return
-	hud.set_prompt("")
+## Diorama camera follow. The player still moves on a single gameplay axis,
+## but the camera sits above and to the right of the street so the scene reads
+## like a miniature paper set instead of a flat side elevation.
+@export var camera_follow_smoothing: float = 6.0
+@export var camera_position_offset := Vector3(14.0, 11.0, 0.0)
+@export var camera_look_offset := Vector3(-5.5, 1.5, 0.0)
+@onready var side_camera: Camera3D = $SideCamera
+
+
+func _process(delta: float) -> void:
+	# Update the HUD prompt based on the closest interactable in the player's
+	# proximity bubble. Replaces the 3D camera-raycast — a side-scroll player
+	# has no aim cursor, so proximity is the natural cue.
+	var target = player.closest_interactable() if player.has_method("closest_interactable") else null
+	if target:
+		hud.set_prompt(target.prompt_text())
+	else:
+		hud.set_prompt("")
+
+	_update_camera_transform(delta)
+
+
+func _update_camera_transform(delta: float) -> void:
+	if not side_camera:
+		return
+
+	var target_position := Vector3(
+		camera_position_offset.x,
+		camera_position_offset.y,
+		player.global_position.z + camera_position_offset.z
+	)
+	var weight := clampf(delta * camera_follow_smoothing, 0.0, 1.0)
+	side_camera.global_position = side_camera.global_position.lerp(target_position, weight)
+
+	var look_target := Vector3(
+		camera_look_offset.x,
+		camera_look_offset.y,
+		side_camera.global_position.z + camera_look_offset.z
+	)
+	side_camera.look_at(look_target, Vector3.UP)
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
-		var ray: RayCast3D = player.get_node("Camera3D/InteractionRay")
-		if ray.is_colliding():
-			var hit = ray.get_collider()
-			if hit and hit is InteractableObject and hit.enabled:
-				hit.interact(player)
+		var target = player.closest_interactable() if player.has_method("closest_interactable") else null
+		if target:
+			target.interact(player)
