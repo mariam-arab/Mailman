@@ -1,21 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://b1mailman1hud"]
+[gd_scene load_steps=4 format=3 uid="uid://b1mailman1hud"]
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBox_envelope"]
-bg_color = Color(0.96, 0.91, 0.78, 1)
-border_color = Color(0.45, 0.28, 0.18, 1)
-border_width_left = 3
-border_width_right = 3
-border_width_top = 3
-border_width_bottom = 3
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_left = 4
-corner_radius_bottom_right = 4
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 16
-shadow_offset = Vector2(0, 8)
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_dim"]
 bg_color = Color(0, 0, 0, 0.55)
@@ -77,81 +62,31 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_styles/panel = SubResource("StyleBox_dim")
 
-[node name="Envelope" type="Panel" parent="Inspection"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -360.0
-offset_top = -220.0
-offset_right = 360.0
-offset_bottom = 220.0
-theme_override_styles/panel = SubResource("StyleBox_envelope")
-
-[node name="Front" type="VBoxContainer" parent="Inspection/Envelope"]
+; Cards are added dynamically by hud.gd. alignment=1 centres them horizontally.
+; offset_bottom reserves space for the PagerHint label below.
+[node name="CarouselRow" type="HBoxContainer" parent="Inspection"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 36.0
-offset_top = 28.0
-offset_right = -36.0
-offset_bottom = -56.0
-theme_override_constants/separation = 22
+offset_left = 40.0
+offset_right = -40.0
+offset_bottom = -60.0
+alignment = 1
+theme_override_constants/separation = 24
 
-[node name="Sender" type="Label" parent="Inspection/Envelope/Front"]
-text = ""
-theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.25, 0.18, 0.12, 1)
-
-[node name="Address" type="Label" parent="Inspection/Envelope/Front"]
-text = ""
-theme_override_font_sizes/font_size = 26
-theme_override_colors/font_color = Color(0.25, 0.18, 0.12, 1)
-horizontal_alignment = 1
-
-[node name="Recipient" type="Label" parent="Inspection/Envelope/Front"]
-text = ""
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.35, 0.22, 0.15, 1)
-
-[node name="Back" type="VBoxContainer" parent="Inspection/Envelope"]
-visible = false
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 48.0
-offset_top = 36.0
-offset_right = -48.0
-offset_bottom = -56.0
-
-[node name="BackTitle" type="Label" parent="Inspection/Envelope/Back"]
-text = "— scrawled on the back —"
-theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.4, 0.28, 0.20, 1)
-horizontal_alignment = 1
-
-[node name="Clue" type="Label" parent="Inspection/Envelope/Back"]
-text = ""
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.20, 0.15, 0.10, 1)
-
-[node name="Pager" type="Label" parent="Inspection/Envelope"]
-anchors_preset = 7
-anchor_left = 0.5
+[node name="PagerHint" type="Label" parent="Inspection"]
 anchor_top = 1.0
-anchor_right = 0.5
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -180.0
-offset_top = -36.0
-offset_right = 180.0
+offset_top = -44.0
 offset_bottom = -12.0
 text = ""
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.45, 0.30, 0.20, 1)
+theme_override_colors/font_color = Color(0.85, 0.80, 0.72, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 1
 
 [node name="Summary" type="Control" parent="."]
 visible = false
