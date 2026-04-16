@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(godot --version)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --version)",
+      "Bash(/Applications/Godot.app/Contents/MacOS/Godot --headless --quit --editor)",
+      "Bash(timeout 8 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . res://scenes/levels/neighborhood_01.tscn)",
+      "Bash(git init:*)",
+      "Bash(git -c user.email=arab@local -c user.name=arab commit -m \"Initial 3D walking-skeleton through Sprint 5 of Special Delivery spec\")"
+    ]
+  }
+}

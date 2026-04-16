@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3 uid="uid://b1mailman1mailbox"]
+
+[ext_resource type="Script" path="res://scripts/interactables/mailbox.gd" id="1_mailbox"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_mailbox"]
+size = Vector3(0.5, 1.4, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="Material_post"]
+albedo_color = Color(0.32, 0.22, 0.16, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_box"]
+albedo_color = Color(0.62, 0.13, 0.13, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="Material_flag"]
+albedo_color = Color(0.85, 0.78, 0.18, 1)
+roughness = 0.9
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_post"]
+top_radius = 0.04
+bottom_radius = 0.04
+height = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_box"]
+size = Vector3(0.42, 0.28, 0.34)
+
+[node name="Mailbox" type="StaticBody3D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_mailbox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+shape = SubResource("BoxShape3D_mailbox")
+
+[node name="Post" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("CylinderMesh_post")
+surface_material_override/0 = SubResource("Material_post")
+
+[node name="Box" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+mesh = SubResource("BoxMesh_box")
+surface_material_override/0 = SubResource("Material_box")
+
+[node name="FlagPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.21, 1.05, 0)
+
+[node name="Flag" type="MeshInstance3D" parent="FlagPivot"]
+transform = Transform3D(0.18, 0, 0, 0, 0.02, 0, 0, 0, 0.12, 0.09, 0, 0)
+mesh = SubResource("BoxMesh_box")
+surface_material_override/0 = SubResource("Material_flag")
+
+[node name="SuccessSound" type="AudioStreamPlayer3D" parent="."]
+unit_size = 6.0
+
+[node name="RejectSound" type="AudioStreamPlayer3D" parent="."]
+unit_size = 6.0
+volume_db = -4.0

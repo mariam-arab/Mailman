@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3 uid="uid://b1mailman1tree"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_trunk"]
+radius = 0.3
+height = 2.4
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
+top_radius = 0.18
+bottom_radius = 0.24
+height = 2.4
+
+[sub_resource type="StandardMaterial3D" id="Material_trunk"]
+albedo_color = Color(0.40, 0.26, 0.16, 1)
+roughness = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_canopy"]
+radius = 1.4
+height = 2.6
+
+[sub_resource type="StandardMaterial3D" id="Material_canopy"]
+albedo_color = Color(0.78, 0.34, 0.14, 1)
+roughness = 1.0
+
+[node name="Tree" type="StaticBody3D"]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+shape = SubResource("CapsuleShape3D_trunk")
+
+[node name="Trunk" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+mesh = SubResource("CylinderMesh_trunk")
+surface_material_override/0 = SubResource("Material_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+mesh = SubResource("SphereMesh_canopy")
+surface_material_override/0 = SubResource("Material_canopy")
