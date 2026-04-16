@@ -1,29 +1,65 @@
-[gd_scene load_steps=8 format=3 uid="uid://b1mailman1house"]
+[gd_scene load_steps=15 format=3 uid="uid://b1mailman1house"]
 
 [ext_resource type="Script" path="res://scripts/houses/house.gd" id="1_house"]
 
+; A blockier, more vibrant cardstock cottage. From the side-camera (+X looking
+; -X) the player sees: roof prism + roof trim band + body box + chimney +
+; left/right windows + central door with steps. House body and roof colors
+; come from the script's exported properties so each instance picks its own.
+;
+; Note about orientation: the level instantiates the house with a 90° Y-yaw
+; so its facade (the door + windows on -Z here) faces the camera (+X world).
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_body"]
-size = Vector3(5, 3, 4)
+size = Vector3(5, 3, 4.4)
 
 [sub_resource type="BoxMesh" id="BoxMesh_body"]
-size = Vector3(5, 3, 4)
+size = Vector3(5, 3, 4.4)
 
 [sub_resource type="PrismMesh" id="PrismMesh_roof"]
 left_to_right = 0.5
-size = Vector3(5.4, 1.6, 4.4)
+size = Vector3(5.6, 1.7, 4.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_roof_trim"]
+size = Vector3(5.6, 0.18, 4.6)
+
+[sub_resource type="StandardMaterial3D" id="Material_roof_trim"]
+albedo_color = Color(0.96, 0.91, 0.78, 1)
+roughness = 1.0
 
 [sub_resource type="StandardMaterial3D" id="Material_window"]
-albedo_color = Color(1, 0.78, 0.45, 1)
+albedo_color = Color(1, 0.82, 0.45, 1)
 emission_enabled = true
-emission = Color(1, 0.78, 0.45, 1)
-emission_energy_multiplier = 1.6
+emission = Color(1, 0.82, 0.45, 1)
+emission_energy_multiplier = 1.4
+roughness = 1.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_window"]
 size = Vector3(0.8, 0.7, 0.05)
 
-[sub_resource type="StandardMaterial3D" id="Material_door"]
-albedo_color = Color(0.32, 0.18, 0.12, 1)
+[sub_resource type="StandardMaterial3D" id="Material_window_frame"]
+albedo_color = Color(0.96, 0.94, 0.86, 1)
 roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_window_frame"]
+size = Vector3(1.0, 0.9, 0.05)
+
+[sub_resource type="StandardMaterial3D" id="Material_door"]
+albedo_color = Color(0.55, 0.30, 0.18, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_door"]
+size = Vector3(0.9, 1.7, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="Material_chimney"]
+albedo_color = Color(0.72, 0.50, 0.32, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_chimney"]
+size = Vector3(0.5, 1.2, 0.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_steps"]
+size = Vector3(1.4, 0.2, 0.4)
 
 [node name="House" type="StaticBody3D"]
 collision_layer = 1
@@ -38,22 +74,52 @@ shape = SubResource("BoxShape3D_body")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
 mesh = SubResource("BoxMesh_body")
 
+[node name="RoofTrim" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.05, 0)
+mesh = SubResource("BoxMesh_roof_trim")
+surface_material_override/0 = SubResource("Material_roof_trim")
+
 [node name="Roof" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.8, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 0)
 mesh = SubResource("PrismMesh_roof")
 
-[node name="Window" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 1.7, 2.05)
+[node name="Chimney" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 4.6, 1.2)
+mesh = SubResource("BoxMesh_chimney")
+surface_material_override/0 = SubResource("Material_chimney")
+
+[node name="WindowFrameLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.7, -2.21)
+mesh = SubResource("BoxMesh_window_frame")
+surface_material_override/0 = SubResource("Material_window_frame")
+
+[node name="WindowLeft" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1.7, -2.24)
+mesh = SubResource("BoxMesh_window")
+surface_material_override/0 = SubResource("Material_window")
+
+[node name="WindowFrameRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.7, -2.21)
+mesh = SubResource("BoxMesh_window_frame")
+surface_material_override/0 = SubResource("Material_window_frame")
+
+[node name="WindowRight" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1.7, -2.24)
 mesh = SubResource("BoxMesh_window")
 surface_material_override/0 = SubResource("Material_window")
 
 [node name="WindowLight" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 1.7, 2.4)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, -1.6)
 light_color = Color(1, 0.78, 0.45, 1)
-light_energy = 0.6
-omni_range = 3.0
+light_energy = 0.8
+omni_range = 4.0
 
 [node name="Door" type="MeshInstance3D" parent="."]
-transform = Transform3D(0.6, 0, 0, 0, 1.4, 0, 0, 0, 0.06, 1.0, 0.7, 2.05)
-mesh = SubResource("BoxMesh_window")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, -2.24)
+mesh = SubResource("BoxMesh_door")
 surface_material_override/0 = SubResource("Material_door")
+
+[node name="Steps" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, -2.45)
+mesh = SubResource("BoxMesh_steps")
+surface_material_override/0 = SubResource("Material_roof_trim")

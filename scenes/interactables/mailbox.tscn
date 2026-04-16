@@ -1,29 +1,48 @@
-[gd_scene load_steps=8 format=3 uid="uid://b1mailman1mailbox"]
+[gd_scene load_steps=11 format=3 uid="uid://b1mailman1mailbox"]
 
 [ext_resource type="Script" path="res://scripts/interactables/mailbox.gd" id="1_mailbox"]
 
+; Heritage Canada Post style — chunky red box on a short post, with a small
+; cream slot near the top and a yellow flag on a thin pivot.
+; The maple-leaf decal is faked with a small red prism on a cream patch — no
+; texture needed and reads correctly at side-camera distance.
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_mailbox"]
-size = Vector3(0.5, 1.4, 0.5)
+size = Vector3(0.6, 1.6, 0.7)
 
 [sub_resource type="StandardMaterial3D" id="Material_post"]
 albedo_color = Color(0.32, 0.22, 0.16, 1)
 roughness = 1.0
 
 [sub_resource type="StandardMaterial3D" id="Material_box"]
-albedo_color = Color(0.62, 0.13, 0.13, 1)
+albedo_color = Color(0.78, 0.16, 0.16, 1)
 roughness = 0.95
 
 [sub_resource type="StandardMaterial3D" id="Material_flag"]
-albedo_color = Color(0.85, 0.78, 0.18, 1)
+albedo_color = Color(0.95, 0.78, 0.18, 1)
 roughness = 0.9
 
+[sub_resource type="StandardMaterial3D" id="Material_slot"]
+albedo_color = Color(0.96, 0.91, 0.78, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_leaf"]
+albedo_color = Color(0.92, 0.45, 0.30, 1)
+roughness = 1.0
+
 [sub_resource type="CylinderMesh" id="CylinderMesh_post"]
-top_radius = 0.04
-bottom_radius = 0.04
+top_radius = 0.06
+bottom_radius = 0.06
 height = 0.9
 
 [sub_resource type="BoxMesh" id="BoxMesh_box"]
-size = Vector3(0.42, 0.28, 0.34)
+size = Vector3(0.55, 0.45, 0.6)
+
+[sub_resource type="BoxMesh" id="BoxMesh_slot"]
+size = Vector3(0.36, 0.06, 0.04)
+
+[sub_resource type="BoxMesh" id="BoxMesh_decal"]
+size = Vector3(0.22, 0.22, 0.04)
 
 [node name="Mailbox" type="StaticBody3D"]
 collision_layer = 4
@@ -31,7 +50,7 @@ collision_mask = 0
 script = ExtResource("1_mailbox")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
 shape = SubResource("BoxShape3D_mailbox")
 
 [node name="Post" type="MeshInstance3D" parent="."]
@@ -40,15 +59,33 @@ mesh = SubResource("CylinderMesh_post")
 surface_material_override/0 = SubResource("Material_post")
 
 [node name="Box" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.15, 0)
 mesh = SubResource("BoxMesh_box")
 surface_material_override/0 = SubResource("Material_box")
 
+; Cream slot near the top of the box, on the +X face (the face the player
+; sees from the side camera).
+[node name="Slot" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30, 1.30, 0)
+mesh = SubResource("BoxMesh_slot")
+surface_material_override/0 = SubResource("Material_slot")
+
+; Cream "Canada Post" patch with a small red leaf on top.
+[node name="Decal" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.30, 1.05, 0)
+mesh = SubResource("BoxMesh_decal")
+surface_material_override/0 = SubResource("Material_slot")
+
+[node name="DecalLeaf" type="MeshInstance3D" parent="Decal"]
+transform = Transform3D(0.55, 0, 0, 0, 0.55, 0, 0, 0, 0.55, 0.025, 0, 0)
+mesh = SubResource("BoxMesh_decal")
+surface_material_override/0 = SubResource("Material_leaf")
+
 [node name="FlagPivot" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.21, 1.05, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 1.40, 0.30)
 
 [node name="Flag" type="MeshInstance3D" parent="FlagPivot"]
-transform = Transform3D(0.18, 0, 0, 0, 0.02, 0, 0, 0, 0.12, 0.09, 0, 0)
+transform = Transform3D(0.18, 0, 0, 0, 0.02, 0, 0, 0, 0.16, 0.09, 0, 0)
 mesh = SubResource("BoxMesh_box")
 surface_material_override/0 = SubResource("Material_flag")
 

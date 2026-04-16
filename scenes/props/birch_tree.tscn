@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://dubcydiiycvo6"]
+
+; Birch — thin pale-white trunk, smaller crumpled canopy in muted yellow.
+; Used as filler between/behind the maple trees in the reference image.
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_trunk"]
+radius = 0.14
+height = 4.2
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
+top_radius = 0.10
+bottom_radius = 0.13
+height = 4.2
+
+[sub_resource type="StandardMaterial3D" id="Material_trunk"]
+albedo_color = Color(0.94, 0.92, 0.85, 1)
+roughness = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_canopy"]
+radius = 0.85
+height = 1.6
+radial_segments = 10
+rings = 5
+
+[sub_resource type="StandardMaterial3D" id="Material_canopy"]
+albedo_color = Color(0.88, 0.72, 0.30, 1)
+roughness = 1.0
+
+[node name="BirchTree" type="StaticBody3D"]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+shape = SubResource("CapsuleShape3D_trunk")
+
+[node name="Trunk" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.1, 0)
+mesh = SubResource("CylinderMesh_trunk")
+surface_material_override/0 = SubResource("Material_trunk")
+
+[node name="Canopy" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.6, 0)
+mesh = SubResource("SphereMesh_canopy")
+surface_material_override/0 = SubResource("Material_canopy")

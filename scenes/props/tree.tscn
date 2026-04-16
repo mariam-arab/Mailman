@@ -1,39 +1,78 @@
-[gd_scene load_steps=6 format=3 uid="uid://b1mailman1tree"]
+[gd_scene load_steps=10 format=3 uid="uid://b1mailman1tree"]
+
+; Maple-style tree with a "crumpled paper" canopy. We approximate the
+; hand-crumpled tissue look by stacking three sphere blobs at slight offsets
+; with three different autumn colors (red, orange, yellow) — the silhouette
+; reads as one ragged ball rather than a clean sphere, which is what the
+; reference image shows.
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_trunk"]
-radius = 0.3
-height = 2.4
+radius = 0.32
+height = 3.4
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
-top_radius = 0.18
-bottom_radius = 0.24
-height = 2.4
+top_radius = 0.20
+bottom_radius = 0.30
+height = 3.4
 
 [sub_resource type="StandardMaterial3D" id="Material_trunk"]
-albedo_color = Color(0.40, 0.26, 0.16, 1)
+albedo_color = Color(0.36, 0.22, 0.14, 1)
 roughness = 1.0
 
-[sub_resource type="SphereMesh" id="SphereMesh_canopy"]
-radius = 1.4
-height = 2.6
+; Three canopy blobs — different sizes give a "crumpled" silhouette.
+[sub_resource type="SphereMesh" id="SphereMesh_blob_a"]
+radius = 1.6
+height = 3.0
+radial_segments = 12
+rings = 6
 
-[sub_resource type="StandardMaterial3D" id="Material_canopy"]
-albedo_color = Color(0.78, 0.34, 0.14, 1)
+[sub_resource type="SphereMesh" id="SphereMesh_blob_b"]
+radius = 1.3
+height = 2.4
+radial_segments = 12
+rings = 6
+
+[sub_resource type="SphereMesh" id="SphereMesh_blob_c"]
+radius = 1.1
+height = 2.0
+radial_segments = 12
+rings = 6
+
+[sub_resource type="StandardMaterial3D" id="Material_red"]
+albedo_color = Color(0.78, 0.20, 0.18, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_orange"]
+albedo_color = Color(0.92, 0.48, 0.18, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_yellow"]
+albedo_color = Color(0.95, 0.78, 0.22, 1)
 roughness = 1.0
 
 [node name="Tree" type="StaticBody3D"]
 collision_layer = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 shape = SubResource("CapsuleShape3D_trunk")
 
 [node name="Trunk" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
 mesh = SubResource("CylinderMesh_trunk")
 surface_material_override/0 = SubResource("Material_trunk")
 
-[node name="Canopy" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
-mesh = SubResource("SphereMesh_canopy")
-surface_material_override/0 = SubResource("Material_canopy")
+[node name="BlobRed" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 4.0, 0.2)
+mesh = SubResource("SphereMesh_blob_a")
+surface_material_override/0 = SubResource("Material_red")
+
+[node name="BlobOrange" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 4.4, -0.3)
+mesh = SubResource("SphereMesh_blob_b")
+surface_material_override/0 = SubResource("Material_orange")
+
+[node name="BlobYellow" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 5.0, 0.4)
+mesh = SubResource("SphereMesh_blob_c")
+surface_material_override/0 = SubResource("Material_yellow")
