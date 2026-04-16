@@ -103,7 +103,7 @@ func _refresh_carousel() -> void:
 			break
 		_apply_card_state(_cards[i], bag[i], i == sel)
 	if bag.size() > 0:
-		pager_hint.text = "%d / %d   ◀ Q   scroll ▶   R: flip" % [sel + 1, bag.size()]
+		pager_hint.text = "%d / %d   ◀ A   D ▶   R: flip" % [sel + 1, bag.size()]
 	else:
 		pager_hint.text = "Bag empty"
 
