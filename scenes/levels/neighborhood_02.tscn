@@ -629,6 +629,8 @@ surface_material_override/0 = SubResource("Material_flower_purple")
 
 [node name="MrHughes" parent="." unique_id=374860554 instance=ExtResource("10_gossip")]
 transform = Transform3D(-0.8746088, 0.017442474, 0.48461807, 0.01688344, 1.2198253, 0.0009726048, -0.48453492, 0.0110198585, -0.8747251, 0.3, 0, -13)
+speaker_name = "Mr. Hughes"
+intro_lines = ["Morning! New face on the route? Welcome to Maple Street. Name's Mr. Hughes. Lived here thirty years.", "Now, most of these neighbours... well. They keep to themselves, some of them. I won't say more.", "But my neighbour Tom, heart of gold that one. Very friendly. You'll like him.", "Tab opens your mail bag. Drag a letter onto a mailbox slot to deliver.", "Right! Off you go. Mind the gardens!"]
 
 [node name="Player" parent="." unique_id=1571739222 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -14)
