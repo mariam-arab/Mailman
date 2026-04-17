@@ -1013,7 +1013,7 @@ func _on_day_ended(day: int, results: Array) -> void:
 	for r in results:
 		if r["delivered"] and r["correct"]:
 			correct += 1
-	summary_label.text = "Day %d complete\n\n%d / %d letters delivered correctly\n\nESC to release mouse" % [
+	summary_label.text = "Day %d complete\n\n%d / %d letters delivered correctly\n\nPress E to continue" % [
 		day, correct, results.size()
 	]
 	summary.visible     = true

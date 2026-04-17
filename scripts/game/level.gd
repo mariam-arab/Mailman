@@ -4,8 +4,12 @@ extends Node3D
 ## front of the camera, updates the HUD prompt, and routes E presses to the
 ## targeted interactable.
 
+@export var next_level_path: String = ""
+
 @onready var player: CharacterBody3D = $Player
 @onready var hud: CanvasLayer = $HUD
+
+var _day_complete: bool = false
 
 ## The Day 1 letters, assembled in code so we don't depend on .tres files
 ## existing yet. They reference house_id values that match the mailboxes
@@ -72,6 +76,11 @@ func _ready() -> void:
 	hud.bind_player(player)
 	GameState.start_day(1, _build_day_one_letters())
 	_update_camera_transform(1.0)
+	GameState.day_ended.connect(_on_day_ended)
+
+
+func _on_day_ended(_day: int, _results: Array) -> void:
+	_day_complete = true
 
 
 func _build_day_one_letters() -> Array:
@@ -130,6 +139,10 @@ func _update_camera_transform(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _day_complete and event.is_action_pressed("interact"):
+		if next_level_path != "":
+			get_tree().change_scene_to_file(next_level_path)
+		return
 	if event.is_action_pressed("interact"):
 		var target = player.closest_interactable() if player.has_method("closest_interactable") else null
 		if not target:

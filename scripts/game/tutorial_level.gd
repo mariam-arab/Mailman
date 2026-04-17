@@ -3,10 +3,14 @@ extends Node3D
 ## Six deliveries introducing the core mechanic: some addresses are complete,
 ## some are partially obscured. Walk up to Supervisor Bauer and press E to begin.
 
+@export var next_level_path: String = "res://scenes/levels/neighborhood_02.tscn"
+
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD
 @onready var boss:        Gossip          = $Boss
 @onready var side_camera: Camera3D        = $SideCamera
+
+var _day_complete: bool = false
 
 # ── letter data ───────────────────────────────────────────────────────────────
 
@@ -79,6 +83,11 @@ func _ready() -> void:
 	hud.bind_player(player)
 	GameState.start_day(1, _build_letters())
 	_update_camera_transform(1.0)
+	GameState.day_ended.connect(_on_day_ended)
+
+
+func _on_day_ended(_day: int, _results: Array) -> void:
+	_day_complete = true
 
 
 func _build_letters() -> Array:
@@ -123,6 +132,10 @@ func _update_camera_transform(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _day_complete and event.is_action_pressed("interact"):
+		if next_level_path != "":
+			get_tree().change_scene_to_file(next_level_path)
+		return
 	if event.is_action_pressed("interact"):
 		var target = player.closest_interactable() if player.has_method("closest_interactable") else null
 		if not target:
