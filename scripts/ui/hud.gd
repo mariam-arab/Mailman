@@ -41,6 +41,11 @@ var _saved_positions: Dictionary = {}
 var _slot_panels: Dictionary    = {}
 var _camera: Camera3D           = null
 
+# Letters that have been delivered but can still be dragged back (Mail → mailbox node)
+var _delivered_letters: Dictionary = {}
+# Cards parked in delivery slots (mailbox node → Panel card)
+var _slotted_cards: Dictionary  = {}
+
 # Notebook
 const _NB_PAGES := [
 	"Today's Route\n\n• House A — The Baker\n• House B — Hockey Family\n• House E — The Professor",
@@ -123,7 +128,9 @@ func set_nearby_interactable(target) -> void:
 
 
 func open_inspection() -> void:
-	if _showing_inspection or GameState.mail_bag.is_empty():
+	if _showing_inspection:
+		return
+	if GameState.mail_bag.is_empty() and _delivered_letters.is_empty():
 		return
 	_showing_inspection = true
 	inspection.visible  = true
@@ -194,7 +201,7 @@ func _input(event: InputEvent) -> void:
 
 
 func _toggle_inspection() -> void:
-	if GameState.mail_bag.is_empty() and not _showing_inspection:
+	if GameState.mail_bag.is_empty() and _delivered_letters.is_empty() and not _showing_inspection:
 		return
 	if _showing_inspection:
 		_showing_inspection = false
@@ -204,6 +211,14 @@ func _toggle_inspection() -> void:
 			var tw := create_tween()
 			tw.tween_property(sp, "modulate:a", 0.0, 0.15)
 		_slot_panels.clear()
+		# Fade out slotted cards — they will be recreated on next open
+		for mb in _slotted_cards:
+			var sc: Panel = _slotted_cards[mb]
+			if is_instance_valid(sc):
+				var tw := create_tween()
+				tw.tween_property(sc, "modulate:a", 0.0, 0.15)
+				tw.tween_callback(sc.queue_free)
+		_slotted_cards.clear()
 		_slide_envelopes_out(func():
 			if not _showing_inspection:
 				inspection.visible = false
@@ -221,11 +236,23 @@ func _rebuild_envelopes() -> void:
 		child.queue_free()
 	_cards.clear()
 	_slot_panels.clear()
+	_slotted_cards.clear()
 	var bag := GameState.mail_bag
 	for i in bag.size():
 		var card := _make_envelope(bag[i], i, bag.size())
 		envelopes_layer.add_child(card)
 		_cards.append(card)
+	# Recreate cards for letters already in delivery slots
+	for letter in _delivered_letters:
+		var card := _make_envelope(letter, 0, 0)
+		card.set_meta("in_slot", true)
+		card.set_meta("slot_mailbox", _delivered_letters[letter])
+		card.scale    = Vector2(0.55, 0.55)
+		card.modulate = Color(1, 1, 1, 0)          # start invisible — positioned by _update_delivery_slots
+		card.position = Vector2(-2000.0, -2000.0)  # off-screen until slot panel places it
+		envelopes_layer.add_child(card)
+		envelopes_layer.move_child(card, 0)        # behind bag cards
+		_slotted_cards[_delivered_letters[letter]] = card
 	_slide_envelopes_in()
 	_update_pager_hint()
 
@@ -353,6 +380,12 @@ func _update_delivery_slots() -> void:
 				# Already exists — just update its position.
 				var sp: Panel = _slot_panels[node]
 				sp.position = screen_pos - sp.size * 0.5
+				# Snap any parked card to stay centred on the slot
+				if _slotted_cards.has(node):
+					var sc: Panel = _slotted_cards[node]
+					if is_instance_valid(sc):
+						sc.position  = sp.position + sp.size * 0.5 - sc.size * sc.scale * 0.5
+						sc.modulate.a = 1.0
 			else:
 				# Came into frame — create and fade in.
 				var house_lbl: String = node.house_label if "house_label" in node else "Mailbox"
@@ -363,6 +396,12 @@ func _update_delivery_slots() -> void:
 				_slot_panels[node] = sp
 				var tw := create_tween()
 				tw.tween_property(sp, "modulate:a", 1.0, 0.25)
+				# If a card is already parked here, position and show it
+				if _slotted_cards.has(node):
+					var sc: Panel = _slotted_cards[node]
+					if is_instance_valid(sc):
+						sc.position  = sp.position + sp.size * 0.5 - sc.size * sc.scale * 0.5
+						sc.modulate.a = 1.0
 		else:
 			if _slot_panels.has(node):
 				# Left frame — fade out and remove.
@@ -468,6 +507,15 @@ func _try_start_drag(pos: Vector2) -> void:
 		if _slot_panels.values().has(card):
 			continue
 		if _hit(card, pos):
+			var from_slot: bool = card.get_meta("in_slot", false)
+			if from_slot:
+				# Lift card out of its slot
+				var mb = card.get_meta("slot_mailbox", null)
+				if mb:
+					_slotted_cards.erase(mb)
+				card.set_meta("in_slot", false)
+				card.set_meta("slot_mailbox", null)
+			card.set_meta("was_in_slot", from_slot)
 			_drag_card   = card
 			_drag_offset = pos - card.global_position
 			envelopes_layer.move_child(card, -1)
@@ -479,17 +527,25 @@ func _try_start_drag(pos: Vector2) -> void:
 func _end_drag(pos: Vector2) -> void:
 	if _drag_card == null:
 		return
+	var was_in_slot: bool = _drag_card.get_meta("was_in_slot", false)
 	# Drop onto any mailbox slot → deliver to that mailbox
 	for mb in _slot_panels:
 		var sp: Panel = _slot_panels[mb]
 		if _hit(sp, pos):
 			_deliver_dragged(mb)
 			return
-	# Drag to bottom edge → dismiss to bag
+	# Drag to bottom edge → dismiss (remove from game entirely)
 	var vph := get_viewport().get_visible_rect().size.y
 	if pos.y > vph * 0.85:
+		if was_in_slot:
+			GameState.un_deliver(_drag_card.get_meta("letter"))
+			_delivered_letters.erase(_drag_card.get_meta("letter"))
 		_dismiss_card(_drag_card)
 	else:
+		# Dropped back into bag area
+		if was_in_slot:
+			GameState.un_deliver(_drag_card.get_meta("letter"))
+			_delivered_letters.erase(_drag_card.get_meta("letter"))
 		var tw := create_tween()
 		tw.tween_property(_drag_card, "scale", Vector2.ONE, 0.14)\
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -510,17 +566,24 @@ func _deliver_dragged(mailbox) -> void:
 	var idx := GameState.mail_bag.find(letter)
 	if idx >= 0:
 		GameState.selected_index = idx
-	# Fly to slot then trigger mailbox.
+	# Fly card to slot and shrink it to sit inside the slot panel — but keep it visible.
 	var target: Vector2 = sp.global_position + sp.size * 0.5 - _drag_card.size * 0.5
+	var card: Panel = _drag_card
+	_drag_card = null
+	card.set_meta("in_slot", true)
+	card.set_meta("slot_mailbox", mailbox)
+	card.set_meta("was_in_slot", false)
+	_slotted_cards[mailbox] = card
+	_delivered_letters[letter] = mailbox
+	envelopes_layer.move_child(card, 0)  # behind bag cards so it doesn't block them
 	var tw := create_tween()
-	tw.tween_property(_drag_card, "position", target, 0.18)\
+	tw.tween_property(card, "position", target, 0.18)\
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(_drag_card, "scale", Vector2.ZERO, 0.14)\
+	tw.tween_property(card, "scale", Vector2(0.55, 0.55), 0.14)\
 		.set_trans(Tween.TRANS_CUBIC)
 	var mb = mailbox
 	var pl = _player
 	tw.tween_callback(func(): mb.interact(pl))
-	_drag_card = null
 
 
 func _dismiss_card(card: Panel) -> void:
@@ -611,8 +674,7 @@ func _on_letter_delivered(_letter, _house_id: String, was_correct: bool) -> void
 				Color(0.18, 0.55, 0.20) if was_correct else Color(0.55, 0.40, 0.18))
 			break
 	_saved_positions.erase(_letter.id)
-	if _showing_inspection:
-		_rebuild_envelopes()
+	# Don't rebuild — the card is now parked in the delivery slot and stays visible.
 
 
 func _on_day_ended(day: int, results: Array) -> void:

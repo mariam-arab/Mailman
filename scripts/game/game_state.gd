@@ -74,6 +74,17 @@ func try_deliver(mailbox_house_id: String) -> bool:
 	return true
 
 
+## Reverses a delivery: puts the letter back in the bag and clears its result slot.
+## Only valid while the day is still in progress (before day_ended fires).
+func un_deliver(letter) -> void:
+	for i in results.size():
+		if results[i].get("delivered", false) and results[i]["letter"] == letter:
+			results[i] = {"letter": null, "house_id": "", "correct": false, "delivered": false}
+			break
+	if not mail_bag.has(letter):
+		mail_bag.append(letter)
+
+
 func correct_count() -> int:
 	var c := 0
 	for r in results:

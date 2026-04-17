@@ -65,12 +65,20 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 
-; --- Mail overlay — no dim, world stays visible -------------------------------
+; --- Mail overlay — DimRect darkens world, envelopes pop forward --------------
 [node name="Inspection" type="Control" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 1
+
+; Dim layer — sits behind envelopes, in front of 3D world.
+[node name="DimRect" type="ColorRect" parent="Inspection"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.10, 0.08, 0.06, 0.48)
+mouse_filter = 2
 
 ; Envelopes are added here dynamically by hud.gd.
 [node name="EnvelopesLayer" type="Control" parent="Inspection"]
