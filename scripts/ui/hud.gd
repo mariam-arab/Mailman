@@ -737,6 +737,13 @@ func _update_delivery_slots() -> void:
 				var tw := create_tween()
 				tw.tween_property(sp, "modulate:a", 0.0, 0.20)
 				tw.tween_callback(sp.queue_free)
+				# Hide any delivered card parked here — it will reappear when
+				# the slot scrolls back into view.
+				if _slotted_cards.has(node):
+					var sc: Panel = _slotted_cards[node]
+					if is_instance_valid(sc):
+						sc.modulate.a = 0.0
+						sc.position   = Vector2(-2000.0, -2000.0)
 
 	if _slot_panels.size() != prev_count:
 		_update_pager_hint()
@@ -834,7 +841,11 @@ func _end_drag(pos: Vector2) -> void:
 	var was_in_slot: bool = _drag_card.get_meta("was_in_slot", false)
 
 	for mb in _slot_panels:
-		if _hit(_slot_panels[mb], pos):
+		var sp: Panel = _slot_panels[mb]
+		var center := sp.global_position + sp.size * 0.5
+		# Large delivery zone covering the whole house facade above the slot.
+		var zone := Rect2(center.x - 130.0, center.y - 300.0, 260.0, 360.0)
+		if zone.has_point(pos):
 			_deliver_dragged(mb)
 			return
 
@@ -848,16 +859,13 @@ func _end_drag(pos: Vector2) -> void:
 		if was_in_slot:
 			GameState.un_deliver(_drag_card.get_meta("letter"))
 			_delivered_letters.erase(_drag_card.get_meta("letter"))
+		# Card sticks wherever it was dropped — just reset scale and straighten.
 		var card: Panel = _drag_card
-		var idx  := _cards.find(card)
-		var tw   := create_tween()
+		var tw := create_tween()
 		tw.set_parallel(true)
-		tw.tween_property(card, "scale", Vector2.ONE, 0.14) \
+		tw.tween_property(card, "scale", Vector2.ONE, 0.12) \
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		if idx >= 0:
-			tw.tween_property(card, "position", _fan_position(idx, _cards.size()), 0.22) \
-				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-			tw.tween_property(card, "rotation_degrees", _fan_tilt(idx, _cards.size()), 0.18)
+		tw.tween_property(card, "rotation_degrees", 0.0, 0.16)
 	_drag_card = null
 
 
