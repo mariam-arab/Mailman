@@ -29,8 +29,8 @@ var _drag_offset: Vector2       = Vector2.ZERO
 # Persisted envelope positions (letter.id → Vector2)
 var _saved_positions: Dictionary = {}
 
-# Delivery slot projected from the 3D mailbox
-var _slot_panel: Panel          = null
+# Delivery slots projected from 3D mailboxes in frame (interactable → Panel)
+var _slot_panels: Dictionary    = {}
 var _camera: Camera3D           = null
 
 # Notebook
@@ -118,8 +118,6 @@ func open_inspection() -> void:
 	_showing_inspection = true
 	inspection.visible  = true
 	_rebuild_envelopes()
-	if _player and _player.has_method("set_input_active"):
-		_player.set_input_active(false)
 
 
 # ── input ─────────────────────────────────────────────────────────────────────
@@ -157,11 +155,11 @@ func _toggle_inspection() -> void:
 	if _showing_inspection:
 		_showing_inspection = false
 		_drag_card = null
-		if _player and _player.has_method("set_input_active"):
-			_player.set_input_active(true)
-		if _slot_panel:
+		for mb in _slot_panels:
+			var sp: Panel = _slot_panels[mb]
 			var tw := create_tween()
-			tw.tween_property(_slot_panel, "modulate:a", 0.0, 0.15)
+			tw.tween_property(sp, "modulate:a", 0.0, 0.15)
+		_slot_panels.clear()
 		_slide_envelopes_out(func():
 			if not _showing_inspection:
 				inspection.visible = false
@@ -170,8 +168,6 @@ func _toggle_inspection() -> void:
 		_showing_inspection = true
 		inspection.visible  = true
 		_rebuild_envelopes()
-		if _player and _player.has_method("set_input_active"):
-			_player.set_input_active(false)
 
 
 # ── envelopes ─────────────────────────────────────────────────────────────────
@@ -180,13 +176,12 @@ func _rebuild_envelopes() -> void:
 	for child in envelopes_layer.get_children():
 		child.queue_free()
 	_cards.clear()
-	_slot_panel = null
+	_slot_panels.clear()
 	var bag := GameState.mail_bag
 	for i in bag.size():
 		var card := _make_envelope(bag[i], i, bag.size())
 		envelopes_layer.add_child(card)
 		_cards.append(card)
-	_build_delivery_slot()
 	_slide_envelopes_in()
 	_update_pager_hint()
 
@@ -289,26 +284,51 @@ func _apply_face(card: Panel, letter, showing_back: bool) -> void:
 		front.get_node("VBox/Recipient").text = letter.recipient_description
 
 
-# ── delivery slot ─────────────────────────────────────────────────────────────
+# ── delivery slots (live, updated every frame while overlay is open) ──────────
 
-func _build_delivery_slot() -> void:
-	if _slot_panel != null:
-		_slot_panel.queue_free()
-		_slot_panel = null
-	if _nearby_interactable == null:
-		return
+func _process(_delta: float) -> void:
+	if _showing_inspection:
+		_update_delivery_slots()
+
+
+func _update_delivery_slots() -> void:
 	_camera = get_viewport().get_camera_3d()
 	if _camera == null:
 		return
+	var vp := get_viewport().get_visible_rect()
+	var prev_count := _slot_panels.size()
 
-	# Project a point just above the mailbox into screen space.
-	var world_pos: Vector3 = _nearby_interactable.global_position + Vector3(0, 2.0, 0)
-	var screen_pos: Vector2 = _camera.unproject_position(world_pos)
+	for node in get_tree().get_nodes_in_group("interactable"):
+		if not (node is InteractableObject) or not node.enabled:
+			continue
+		var world_pos: Vector3 = node.global_position + Vector3(0, 2.0, 0)
+		var screen_pos: Vector2 = _camera.unproject_position(world_pos)
 
-	var house_lbl: String = _nearby_interactable.house_label \
-		if "house_label" in _nearby_interactable else "Mailbox"
-	_slot_panel = _make_slot_panel(house_lbl, screen_pos)
-	envelopes_layer.add_child(_slot_panel)
+		if vp.has_point(screen_pos):
+			if _slot_panels.has(node):
+				# Already exists — just update its position.
+				var sp: Panel = _slot_panels[node]
+				sp.position = screen_pos - sp.size * 0.5
+			else:
+				# Came into frame — create and fade in.
+				var house_lbl: String = node.house_label if "house_label" in node else "Mailbox"
+				var sp := _make_slot_panel(house_lbl, screen_pos)
+				sp.modulate.a = 0.0
+				envelopes_layer.add_child(sp)
+				_slot_panels[node] = sp
+				var tw := create_tween()
+				tw.tween_property(sp, "modulate:a", 1.0, 0.25)
+		else:
+			if _slot_panels.has(node):
+				# Left frame — fade out and remove.
+				var sp: Panel = _slot_panels[node]
+				_slot_panels.erase(node)
+				var tw := create_tween()
+				tw.tween_property(sp, "modulate:a", 0.0, 0.20)
+				tw.tween_callback(sp.queue_free)
+
+	if _slot_panels.size() != prev_count:
+		_update_pager_hint()
 
 
 func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
@@ -360,11 +380,11 @@ func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
 
 
 func _update_slot_highlight(mouse_pos: Vector2) -> void:
-	if _slot_panel == null:
-		return
-	var hot: bool = _hit(_slot_panel, mouse_pos)
-	_slot_panel.add_theme_stylebox_override("panel",
-		_slot_panel.get_meta("sty_hot") if hot else _slot_panel.get_meta("sty_idle"))
+	for mb in _slot_panels:
+		var sp: Panel = _slot_panels[mb]
+		var hot: bool = _hit(sp, mouse_pos)
+		sp.add_theme_stylebox_override("panel",
+			sp.get_meta("sty_hot") if hot else sp.get_meta("sty_idle"))
 
 
 # ── animations ────────────────────────────────────────────────────────────────
@@ -400,7 +420,7 @@ func _try_start_drag(pos: Vector2) -> void:
 	var children := envelopes_layer.get_children()
 	for i in range(children.size() - 1, -1, -1):
 		var card = children[i]
-		if card == _slot_panel:
+		if _slot_panels.values().has(card):
 			continue
 		if _hit(card, pos):
 			_drag_card   = card
@@ -414,10 +434,12 @@ func _try_start_drag(pos: Vector2) -> void:
 func _end_drag(pos: Vector2) -> void:
 	if _drag_card == null:
 		return
-	# Drop onto mailbox slot → deliver
-	if _slot_panel != null and _hit(_slot_panel, pos):
-		_deliver_dragged()
-		return
+	# Drop onto any mailbox slot → deliver to that mailbox
+	for mb in _slot_panels:
+		var sp: Panel = _slot_panels[mb]
+		if _hit(sp, pos):
+			_deliver_dragged(mb)
+			return
 	# Drag to bottom edge → dismiss to bag
 	var vph := get_viewport().get_visible_rect().size.y
 	if pos.y > vph * 0.85:
@@ -430,8 +452,12 @@ func _end_drag(pos: Vector2) -> void:
 	_drag_card = null
 
 
-func _deliver_dragged() -> void:
-	if _drag_card == null or _nearby_interactable == null or _player == null:
+func _deliver_dragged(mailbox) -> void:
+	if _drag_card == null or _player == null:
+		_drag_card = null
+		return
+	var sp: Panel = _slot_panels.get(mailbox)
+	if sp == null:
 		_drag_card = null
 		return
 	var letter = _drag_card.get_meta("letter")
@@ -440,14 +466,13 @@ func _deliver_dragged() -> void:
 	if idx >= 0:
 		GameState.selected_index = idx
 	# Fly to slot then trigger mailbox.
-	var target: Vector2 = _slot_panel.global_position + _slot_panel.size * 0.5 \
-		- _drag_card.size * 0.5
+	var target: Vector2 = sp.global_position + sp.size * 0.5 - _drag_card.size * 0.5
 	var tw := create_tween()
 	tw.tween_property(_drag_card, "position", target, 0.18)\
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 	tw.tween_property(_drag_card, "scale", Vector2.ZERO, 0.14)\
 		.set_trans(Tween.TRANS_CUBIC)
-	var mb = _nearby_interactable
+	var mb = mailbox
 	var pl = _player
 	tw.tween_callback(func(): mb.interact(pl))
 	_drag_card = null
@@ -474,7 +499,7 @@ func _try_flip_at(pos: Vector2) -> void:
 	var children := envelopes_layer.get_children()
 	for i in range(children.size() - 1, -1, -1):
 		var card = children[i]
-		if card != _slot_panel and _hit(card, pos):
+		if not _slot_panels.values().has(card) and _hit(card, pos):
 			_flip_envelope(card)
 			return
 
@@ -512,11 +537,8 @@ func _update_pager_hint() -> void:
 	if bag.is_empty():
 		pager_hint.text = "Bag empty"
 		return
-	if _nearby_interactable != null:
-		var lbl: String = _nearby_interactable.house_label \
-			if "house_label" in _nearby_interactable else ""
-		var dest := "  (" + lbl + ")" if lbl else ""
-		pager_hint.text = "Drag a letter onto the slot to deliver%s   |   right-click to flip" % dest
+	if _slot_panels.size() > 0:
+		pager_hint.text = "Drag a letter onto a mailbox slot to deliver   |   right-click to flip"
 	else:
 		pager_hint.text = "Tab to close   |   right-click to flip   |   walk near a mailbox to deliver"
 
