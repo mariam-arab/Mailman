@@ -718,7 +718,7 @@ func _update_delivery_slots() -> void:
 
 
 
-func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
+func _make_slot_panel(_house_lbl: String, screen_pos: Vector2) -> Panel:
 	const SW := 124.0
 	const SH :=  66.0
 	var p := Panel.new()
@@ -728,13 +728,13 @@ func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
 	p.mouse_filter        = Control.MOUSE_FILTER_PASS
 
 	var sty_idle := StyleBoxFlat.new()
-	sty_idle.bg_color     = Color(0.14, 0.10, 0.06, 0.80)
-	sty_idle.border_color = Color(0.70, 0.50, 0.16, 1)
+	sty_idle.bg_color     = Color(1, 1, 1, 0.18)
+	sty_idle.border_color = Color(1, 1, 1, 0.55)
 	sty_idle.set_border_width_all(2)
 	sty_idle.set_corner_radius_all(8)
 
 	var sty_hot := StyleBoxFlat.new()
-	sty_hot.bg_color     = Color(0.22, 0.16, 0.06, 0.90)
+	sty_hot.bg_color     = Color(1, 1, 1, 0.30)
 	sty_hot.border_color = Color(0.96, 0.78, 0.22, 1)
 	sty_hot.set_border_width_all(3)
 	sty_hot.set_corner_radius_all(8)
@@ -745,15 +745,6 @@ func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
 	p.set_meta("sty_idle", sty_idle)
 	p.set_meta("sty_hot",  sty_hot)
 
-	var lbl := Label.new()
-	lbl.text                 = house_lbl
-	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
-	lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	lbl.add_theme_font_size_override("font_size", 13)
-	lbl.add_theme_color_override("font_color", Color(0.88, 0.84, 0.70, 1))
-
-	p.add_child(lbl)
 	return p
 
 
