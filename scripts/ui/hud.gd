@@ -116,6 +116,7 @@ var _camera: Camera3D          = null
 
 var _delivered_letters: Dictionary = {}
 var _slotted_cards:     Dictionary = {}
+var _saved_positions:   Dictionary = {}  # letter -> Vector2
 
 
 const _NB_PAGES := [
@@ -202,8 +203,8 @@ func bind_player(player: Node) -> void:
 
 
 func set_prompt(text: String) -> void:
-	if _showing_inspection and text == "Tab — open bag to deliver":
-		prompt_label.text = "drag envelope into a mail slot to deliver"
+	if _showing_inspection:
+		prompt_label.text = ""
 	else:
 		prompt_label.text = text
 
@@ -337,6 +338,8 @@ func _toggle_inspection() -> void:
 	if GameState.mail_bag.is_empty() and _delivered_letters.is_empty() and not _showing_inspection:
 		return
 	if _showing_inspection:
+		for card in _cards:
+			_saved_positions[card.get_meta("letter")] = card.position
 		_showing_inspection = false
 		_drag_card   = null
 		_press_card  = null
@@ -376,6 +379,8 @@ func _rebuild_envelopes() -> void:
 	var bag := GameState.mail_bag
 	for i in bag.size():
 		var card := _make_envelope(bag[i], i, bag.size())
+		if _saved_positions.has(bag[i]):
+			card.position = _saved_positions[bag[i]]
 		envelopes_layer.add_child(card)
 		_cards.append(card)
 	for letter in _delivered_letters:
@@ -403,8 +408,8 @@ func _fan_position(index: int, total: int) -> Vector2:
 	var step     := clampf(max_step, 55.0, 110.0)
 	var total_w  := EW + (total - 1) * step
 	var x        := (vp.x - total_w) * 0.5 + index * step
-	# Show ~70 px of card above the tape bar; rest stays below screen edge.
-	var y        := vp.y - 46.0 - 70.0
+	# Show ~95 px of card above the bottom edge.
+	var y        := vp.y - 46.0 - 95.0
 	return Vector2(x, y)
 
 
@@ -515,16 +520,16 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 
 	var sender := Label.new()
 	sender.name          = "Sender"
-	sender.position      = Vector2(16, 12)
-	sender.size          = Vector2(160, 36)
+	sender.position      = Vector2(16, 8)
+	sender.size          = Vector2(130, 28)
 	sender.autowrap_mode = TextServer.AUTOWRAP_WORD
 	sender.add_theme_font_size_override("font_size", 9)
 	sender.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.38))
 
 	var addr := Label.new()
 	addr.name                 = "Address"
-	addr.position             = Vector2(14, 60)
-	addr.size                 = Vector2(EW - 28.0, 62.0)
+	addr.position             = Vector2(14, 42)
+	addr.size                 = Vector2(EW - 28.0, 48.0)
 	addr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	addr.autowrap_mode        = TextServer.AUTOWRAP_WORD
 	addr.add_theme_font_size_override("font_size", 17)
@@ -532,8 +537,8 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 
 	var recip := Label.new()
 	recip.name                 = "Recipient"
-	recip.position             = Vector2(14, 128)
-	recip.size                 = Vector2(EW - 28.0, 24.0)
+	recip.position             = Vector2(14, 94)
+	recip.size                 = Vector2(EW - 28.0, 22.0)
 	recip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	recip.add_theme_font_size_override("font_size", 11)
 	recip.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.28))
@@ -710,6 +715,7 @@ func _update_delivery_slots() -> void:
 			if _slot_panels.has(node):
 				var sp: Panel = _slot_panels[node]
 				sp.position = screen_pos - sp.size * 0.5
+				envelopes_layer.move_child(sp, 0)
 				if _slotted_cards.has(node):
 					var sc: Panel = _slotted_cards[node]
 					if is_instance_valid(sc):
