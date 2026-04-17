@@ -7,10 +7,6 @@ extends CanvasLayer
 @onready var prompt_label:     Label         = $PromptLabel
 @onready var inspection:       Control       = $Inspection
 @onready var envelopes_layer:  Control       = $Inspection/EnvelopesLayer
-@onready var notebook_node:    Panel         = $Inspection/Notebook
-@onready var notebook_content: Label         = $Inspection/Notebook/Content
-@onready var nb_prev:          Label         = $Inspection/Notebook/PagePrev
-@onready var nb_next:          Label         = $Inspection/Notebook/PageNext
 @onready var tape_bar:         Panel         = $Inspection/TapeBar
 @onready var pager_hint:       Label         = $Inspection/TapeBar/PagerHint
 @onready var summary:          Control       = $Summary
@@ -116,13 +112,6 @@ var _slotted_cards:     Dictionary = {}
 var _saved_positions:   Dictionary = {}  # letter -> Vector2
 
 
-const _NB_PAGES := [
-	"Today's Route\n\n311 - L. Hughes\n312 - Thomas (Tom)\n313 - K. Lyne\n314 - J. Sydney\n315 - M. Hughes\n316 - Linda M.",
-	"How to Deliver\n\nWalk near a mailbox.\nA slot appears above it.\n\nOpen your bag (Tab),\nthen drag an envelope\nonto the slot.",
-	"Tips\n\nRight-click an envelope\nto open it and read\nthe message inside.\n\nDrag to the bottom\nedge to put a letter\nback in your bag.",
-]
-var _nb_page: int = 0
-
 var _sty_nb: StyleBoxFlat
 
 
@@ -130,9 +119,7 @@ var _sty_nb: StyleBoxFlat
 
 func _ready() -> void:
 	add_to_group("hud")
-	_build_styles()
 	_build_vignette()
-	_build_notebook()
 	inspection.visible     = false
 	summary.visible        = false
 	dialogue_panel.visible = false
@@ -144,15 +131,7 @@ func _ready() -> void:
 
 
 func _build_styles() -> void:
-	_sty_nb = StyleBoxFlat.new()
-	_sty_nb.bg_color      = Color(0.94, 0.89, 0.74, 1)
-	_sty_nb.border_color  = Color(0.58, 0.42, 0.22, 1)
-	_sty_nb.set_border_width_all(2)
-	_sty_nb.set_corner_radius_all(4)
-	_sty_nb.shadow_color  = Color(0, 0, 0, 0.28)
-	_sty_nb.shadow_size   = 8
-	_sty_nb.shadow_offset = Vector2(2, 4)
-	notebook_node.add_theme_stylebox_override("panel", _sty_nb)
+	pass
 
 
 
@@ -184,12 +163,6 @@ func _build_vignette() -> void:
 	inspection.add_child(tr)
 	inspection.move_child(tr, 2)   # after DimRect(0), StreetName(1); before EnvelopesLayer
 
-
-func _build_notebook() -> void:
-	_nb_page = 0
-	notebook_content.text = _NB_PAGES[0]
-	nb_prev.text = ""
-	nb_next.text = ">" if _NB_PAGES.size() > 1 else ""
 
 
 # -- public API ----------------------------------------------------------------
@@ -272,7 +245,6 @@ func _input(event: InputEvent) -> void:
 			MOUSE_BUTTON_RIGHT:
 				if event.pressed:
 					_try_flip_at(event.global_position)
-					_try_notebook_page(event.global_position)
 
 	elif event is InputEventMouseMotion:
 		if _press_card != null and not _is_dragging:
@@ -958,20 +930,6 @@ func _flip_envelope(card: Panel) -> void:
 	tw.tween_property(card, "scale:x", card.scale.y, 0.10).set_trans(Tween.TRANS_CUBIC)
 
 
-# -- notebook ------------------------------------------------------------------
-
-func _try_notebook_page(pos: Vector2) -> void:
-	if not notebook_node.visible:
-		return
-	var nb_rect := Rect2(notebook_node.global_position, notebook_node.size)
-	if not nb_rect.has_point(pos):
-		return
-	var mid_x := notebook_node.global_position.x + notebook_node.size.x * 0.5
-	_nb_page = wrapi(_nb_page + (1 if pos.x >= mid_x else -1), 0, _NB_PAGES.size())
-	notebook_content.text = _NB_PAGES[_nb_page]
-	nb_prev.text = "<" if _nb_page > 0 else ""
-	nb_next.text = ">" if _nb_page < _NB_PAGES.size() - 1 else ""
-
 
 # -- pager hint ----------------------------------------------------------------
 
@@ -1013,5 +971,3 @@ func _on_day_ended(day: int, results: Array) -> void:
 	_showing_inspection = false
 	if _player and _player.has_method("set_input_active"):
 		_player.set_input_active(false)
-
-
