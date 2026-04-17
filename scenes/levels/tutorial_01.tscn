@@ -9,7 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dubcydiiycvo6" path="res://scenes/props/birch_tree.tscn" id="7_birch"]
 [ext_resource type="PackedScene" uid="uid://dubcydii27ro3" path="res://scenes/props/picket_fence.tscn" id="8_fence"]
 [ext_resource type="PackedScene" uid="uid://dubcydii0fs72" path="res://scenes/props/cloud.tscn" id="9_cloud"]
-[ext_resource type="PackedScene" uid="uid://bdp15q37wljtl" path="res://scenes/interactables/gossip.tscn" id="10_gossip"]
+[ext_resource type="PackedScene" uid="uid://b1mailman1sup" path="res://scenes/interactables/supervisor.tscn" id="10_gossip"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.42, 0.72, 0.96, 1)
