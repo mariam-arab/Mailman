@@ -824,6 +824,10 @@ func _slide_envelopes_out(on_done: Callable) -> void:
 func _end_drag(pos: Vector2) -> void:
 	if _drag_card == null:
 		return
+	# Clamp release position to viewport so off-screen cursor can't
+	# accidentally trigger the dismiss zone or miss delivery zones.
+	var vp_size := get_viewport().get_visible_rect().size
+	pos = Vector2(clampf(pos.x, 0.0, vp_size.x), clampf(pos.y, 0.0, vp_size.y))
 	var was_in_slot: bool = _drag_card.get_meta("was_in_slot", false)
 
 	for mb in _slot_panels:
@@ -832,31 +836,25 @@ func _end_drag(pos: Vector2) -> void:
 			_deliver_dragged(mb)
 			return
 
-	var vph := get_viewport().get_visible_rect().size.y
-	if pos.y > vph - 46.0:
-		if was_in_slot:
-			GameState.un_deliver(_drag_card.get_meta("letter"))
-			_delivered_letters.erase(_drag_card.get_meta("letter"))
-		_dismiss_card(_drag_card)
-	else:
-		if was_in_slot:
-			GameState.un_deliver(_drag_card.get_meta("letter"))
-			_delivered_letters.erase(_drag_card.get_meta("letter"))
-		# Card snaps back into the visible area, resets scale and straightens.
-		var card: Panel = _drag_card
-		var vp_size := get_viewport().get_visible_rect().size
-		var margin  := 24.0
-		var safe := Vector2(
-			clampf(card.position.x, margin, vp_size.x - card.size.x - margin),
-			clampf(card.position.y, margin, vp_size.y - card.size.y * 0.5)
-		)
-		var tw := create_tween()
-		tw.set_parallel(true)
-		tw.tween_property(card, "scale", Vector2.ONE, 0.12) \
-			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		tw.tween_property(card, "rotation_degrees", 0.0, 0.16)
-		tw.tween_property(card, "position", safe, 0.20) \
-			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	# Not on a slot — always snap back. Use global_position (screen space)
+	# so the clamp matches what the drag set, regardless of parent offsets.
+	if was_in_slot:
+		GameState.un_deliver(_drag_card.get_meta("letter"))
+		_delivered_letters.erase(_drag_card.get_meta("letter"))
+	var card: Panel = _drag_card
+	var margin := 0
+	var gpos   := card.global_position
+	var safe_g := Vector2(
+		clampf(gpos.x, margin, vp_size.x - card.size.x - margin),
+		clampf(gpos.y, margin, vp_size.y - card.size.y - margin)
+	)
+	var tw := create_tween()
+	tw.set_parallel(true)
+	tw.tween_property(card, "scale", Vector2.ONE, 0.12) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tw.tween_property(card, "rotation_degrees", 0.0, 0.16)
+	tw.tween_property(card, "global_position", safe_g, 0.20) \
+		.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_drag_card = null
 
 
