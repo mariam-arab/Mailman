@@ -23,6 +23,27 @@ extends StaticBody3D
 
 func _ready() -> void:
 	_apply_colors()
+	_add_number_sign()
+
+
+func _add_number_sign() -> void:
+	if house_label.is_empty():
+		return
+	var lbl := Label3D.new()
+	lbl.text            = house_label
+	lbl.font_size       = 64
+	lbl.outline_size    = 8
+	lbl.modulate        = Color(0.96, 0.91, 0.78, 1)
+	lbl.outline_modulate = Color(0.28, 0.16, 0.08, 1)
+	lbl.billboard       = BaseMaterial3D.BILLBOARD_DISABLED
+	lbl.double_sided    = true
+	lbl.no_depth_test   = false
+	lbl.pixel_size      = 0.006
+	# Above the door (door is at local Z=-2.24, Y≈0.95). The house is rotated
+	# 90° Y in the level so local -Z faces the camera (+X world).
+	lbl.position        = Vector3(0.0, 2.6, -2.28)
+	lbl.scale           = Vector3(-1.0, 1.0, 1.0)
+	add_child(lbl)
 
 
 func _apply_colors() -> void:

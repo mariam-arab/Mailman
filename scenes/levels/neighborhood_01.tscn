@@ -223,7 +223,7 @@ mesh = SubResource("BoxMesh_sidewalk")
 surface_material_override/0 = SubResource("Material_sidewalk")
 
 [node name="HouseA" parent="." unique_id=2095439637 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -6.4, 0, -11)
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -6.4, 0, -11)
 body_color = Color(0.22, 0.65, 0.88, 1)
 roof_color = Color(0.15, 0.32, 0.62, 1)
 house_label = "311"
@@ -234,7 +234,7 @@ house_id = "house_311"
 house_label = "311"
 
 [node name="HouseB" parent="." unique_id=1786162234 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -6, 0, -0.5)
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -6, 0, -0.5)
 body_color = Color(0.92, 0.2, 0.18, 1)
 roof_color = Color(0.5, 0.22, 0.15, 1)
 house_label = "312"
@@ -245,7 +245,7 @@ house_id = "house_312"
 house_label = "312"
 
 [node name="HouseC" parent="." unique_id=1504425202 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -5.8, 0, 10.2)
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -5.8, 0, 10.2)
 body_color = Color(0.96, 0.84, 0.15, 1)
 roof_color = Color(0.55, 0.38, 0.12, 1)
 house_label = "313"
@@ -256,7 +256,7 @@ house_id = "house_313"
 house_label = "313"
 
 [node name="HouseD" parent="." unique_id=607186217 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -6.2, 0, 21)
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -6.2, 0, 21)
 body_color = Color(0.22, 0.78, 0.5, 1)
 roof_color = Color(0.15, 0.42, 0.32, 1)
 house_label = "314"
@@ -267,7 +267,7 @@ house_id = "house_314"
 house_label = "314"
 
 [node name="HouseE" parent="." unique_id=738154609 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -5.9, 0, 31)
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -5.9, 0, 31)
 body_color = Color(0.92, 0.5, 0.2, 1)
 roof_color = Color(0.48, 0.26, 0.12, 1)
 house_label = "315"
@@ -278,7 +278,7 @@ house_id = "house_315"
 house_label = "315"
 
 [node name="HouseF" parent="." unique_id=1544757676 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -6.3, 0, 41.2)
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -6.3, 0, 41.2)
 body_color = Color(0.42, 0.68, 0.32, 1)
 roof_color = Color(0.26, 0.44, 0.18, 1)
 house_label = "316"
