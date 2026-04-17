@@ -13,39 +13,75 @@ extends Node3D
 const DAY_ONE_LETTERS := [
 	{
 		"id": "letter_01",
-		"sender_name": "Boulangerie Saint-Laurent",
-		"sender_address": "12 Rue du Pain, Trois-Rivières",
-		"address_line": "?? Rue de l'Érable / Maple Street",
+		"sender_name": "Fisherman's Digest",
+		"sender_address": "14 Harbour Lane, Halifax",
+		"address_line": "?? Maple Street",
 		"recipient_description":
-			"For the one who always smells like cinnamon and butter.",
+			"For the household that smells faintly of the sea.",
 		"clue_text":
-			"Pour Madame — votre tarte aux pommes habituelle, livrée avant qu'elle ne refroidisse. — J.B.",
-		"correct_house_id": "house_a",
-		"difficulty": 1,
+			"Dear Thomas — your annual subscription renewal is enclosed. Tight lines! — The Editors",
+		"correct_house_id": "house_312",
+		"difficulty": 2,
 	},
 	{
 		"id": "letter_02",
-		"sender_name": "Habs Equipment Co.",
-		"sender_address": "440 Rue Sainte-Catherine, Montréal",
-		"address_line": "?? Rue de l'Érable / Maple Street",
+		"sender_name": "Gardener's Digest",
+		"sender_address": "8 Greenhouse Row, Burlington",
+		"address_line": "?? Maple Street",
 		"recipient_description":
-			"To the household that never seems to take their skates off.",
+			"For the household whose front garden never sleeps.",
 		"clue_text":
-			"Replacement laces enclosed. Good luck at the regional tournament next weekend!",
-		"correct_house_id": "house_b",
+			"Dear Linda — Spring edition enclosed. New column on composting this month! — G.D.",
+		"correct_house_id": "house_316",
 		"difficulty": 1,
 	},
 	{
 		"id": "letter_03",
-		"sender_name": "Université Laval — Department of Astronomy",
-		"sender_address": "2325 Rue de l'Université, Québec",
-		"address_line": "?? Rue de l'Érable / Maple Street",
+		"sender_name": "L. Sydney",
+		"sender_address": "22 Birchwood Drive, Ottawa",
+		"address_line": "?? Maple Street",
 		"recipient_description":
-			"For the gentleman who watches the sky from his upper window.",
+			"A personal letter for the Sydney family.",
 		"clue_text":
-			"Professor — the new lens you ordered has arrived. Mind the packaging.",
-		"correct_house_id": "house_e",
+			"I'll be visiting Thursday. Put the kettle on. Don't tell anyone. — L.",
+		"correct_house_id": "house_314",
 		"difficulty": 2,
+	},
+	{
+		"id": "letter_04",
+		"sender_name": "XO XO Beauty Hair Salon",
+		"sender_address": "5 Glamour Court, Toronto",
+		"address_line": "315 Maple Street",
+		"recipient_description":
+			"For M. Hughes at Number 315.",
+		"clue_text":
+			"Your loyalty card is enclosed. You're overdue for a trim! XOXO — The Team",
+		"correct_house_id": "house_315",
+		"difficulty": 1,
+	},
+	{
+		"id": "letter_05",
+		"sender_name": "A Friend",
+		"sender_address": "— return address withheld —",
+		"address_line": "313 Maple Street",
+		"recipient_description":
+			"For K. Lyne at Number 313.",
+		"clue_text":
+			"You know what this is about. We should talk. — A Friend",
+		"correct_house_id": "house_313",
+		"difficulty": 1,
+	},
+	{
+		"id": "letter_06",
+		"sender_name": "M.",
+		"sender_address": "— return address withheld —",
+		"address_line": "311 Maple Street",
+		"recipient_description":
+			"For L. Hughes at Number 311.",
+		"clue_text":
+			"Don't tell Dad. See you Sunday. — M.",
+		"correct_house_id": "house_311",
+		"difficulty": 1,
 	},
 ]
 
@@ -115,5 +151,9 @@ func _update_camera_transform(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
 		var target = player.closest_interactable() if player.has_method("closest_interactable") else null
-		if target:
+		if not target:
+			return
+		if target is Gossip:
+			target.interact(player)
+		else:
 			hud.open_inspection()

@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://dubcydiiycvo6" path="res://scenes/props/birch_tree.tscn" id="7_birch"]
 [ext_resource type="PackedScene" uid="uid://dubcydii27ro3" path="res://scenes/props/picket_fence.tscn" id="8_fence"]
 [ext_resource type="PackedScene" uid="uid://dubcydii0fs72" path="res://scenes/props/cloud.tscn" id="9_cloud"]
+[ext_resource type="PackedScene" uid="uid://bdp15q37wljtl" path="res://scenes/interactables/gossip.tscn" id="10_gossip"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.42, 0.72, 0.96, 1)
@@ -92,6 +93,54 @@ albedo_color = Color(0.92, 0.78, 0.55, 1)
 
 [sub_resource type="StandardMaterial3D" id="Material_tile_c"]
 albedo_color = Color(0.78, 0.62, 0.78, 1)
+
+; --- Garden decoration meshes for House 316 -----------------------------------
+[sub_resource type="SphereMesh" id="SphereMesh_bush"]
+radius = 0.72
+height = 1.3
+radial_segments = 10
+rings = 5
+
+[sub_resource type="StandardMaterial3D" id="Material_bush"]
+albedo_color = Color(0.28, 0.58, 0.22, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_pot"]
+size = Vector3(0.45, 0.50, 0.45)
+
+[sub_resource type="StandardMaterial3D" id="Material_terracotta"]
+albedo_color = Color(0.72, 0.38, 0.22, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_flower"]
+size = Vector3(0.22, 0.75, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="Material_flower"]
+albedo_color = Color(0.95, 0.78, 0.22, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_flower_pink"]
+albedo_color = Color(0.92, 0.48, 0.72, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_flower_red"]
+albedo_color = Color(0.90, 0.18, 0.18, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_flower_purple"]
+albedo_color = Color(0.62, 0.28, 0.88, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Material_bush_dark"]
+albedo_color = Color(0.18, 0.42, 0.16, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_garden_bed"]
+size = Vector3(2.2, 0.12, 6.0)
+
+[sub_resource type="StandardMaterial3D" id="Material_soil"]
+albedo_color = Color(0.32, 0.20, 0.12, 1)
+roughness = 1.0
 
 [node name="Neighborhood01" type="Node3D" unique_id=1496336094]
 script = ExtResource("1_level")
@@ -182,71 +231,77 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.04, 8)
 mesh = SubResource("BoxMesh_sidewalk")
 surface_material_override/0 = SubResource("Material_sidewalk")
 
+; 311 — L. Hughes (first house, blue)
 [node name="HouseA" parent="." unique_id=2095439637 instance=ExtResource("4_house")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6.4, 0, -11)
 body_color = Color(0.22, 0.65, 0.88, 1)
 roof_color = Color(0.15, 0.32, 0.62, 1)
-house_label = "316"
+house_label = "311"
 
 [node name="MailboxA" parent="." unique_id=73382580 instance=ExtResource("5_mailbox")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0, -10.2)
-house_id = "house_316"
-house_label = "316"
+house_id = "house_311"
+house_label = "311"
 
+; 312 — Thomas Heart (red)
 [node name="HouseB" parent="." unique_id=1786162234 instance=ExtResource("4_house")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6, 0, -0.5)
 body_color = Color(0.92, 0.2, 0.18, 1)
 roof_color = Color(0.5, 0.22, 0.15, 1)
-house_label = "315"
+house_label = "312"
 
 [node name="MailboxB" parent="." unique_id=960657732 instance=ExtResource("5_mailbox")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0, 0.3)
-house_id = "house_315"
-house_label = "315"
+house_id = "house_312"
+house_label = "312"
 
+; 313 — K. Lyne (yellow)
 [node name="HouseC" parent="." unique_id=1504425202 instance=ExtResource("4_house")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -5.8, 0, 10.2)
 body_color = Color(0.96, 0.84, 0.15, 1)
 roof_color = Color(0.55, 0.38, 0.12, 1)
-house_label = "314"
+house_label = "313"
 
 [node name="MailboxC" parent="." unique_id=144983231 instance=ExtResource("5_mailbox")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10.9)
-house_id = "house_314"
-house_label = "314"
+house_id = "house_313"
+house_label = "313"
 
+; 314 — Sydney family (teal)
 [node name="HouseD" parent="." unique_id=607186217 instance=ExtResource("4_house")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6.2, 0, 21)
 body_color = Color(0.22, 0.78, 0.5, 1)
 roof_color = Color(0.15, 0.42, 0.32, 1)
-house_label = "313"
+house_label = "314"
 
 [node name="MailboxD" parent="." unique_id=809093751 instance=ExtResource("5_mailbox")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0, 20.7)
-house_id = "house_313"
-house_label = "313"
+house_id = "house_314"
+house_label = "314"
 
+; 315 — M. Hughes (orange — Mr. Hughes lives here)
 [node name="HouseE" parent="." unique_id=738154609 instance=ExtResource("4_house")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -5.9, 0, 31)
 body_color = Color(0.92, 0.5, 0.2, 1)
 roof_color = Color(0.48, 0.26, 0.12, 1)
-house_label = "312"
+house_label = "315"
 
 [node name="MailboxE" parent="." unique_id=177749693 instance=ExtResource("5_mailbox")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 30.5)
-house_id = "house_312"
-house_label = "312"
+house_id = "house_315"
+house_label = "315"
 
+; 316 — Linda Michaels (garden house, earthy green, far end)
 [node name="HouseF" parent="." unique_id=1544757676 instance=ExtResource("4_house")]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6.3, 0, 41.2)
-body_color = Color(0.7, 0.3, 0.85, 1)
-roof_color = Color(0.38, 0.18, 0.48, 1)
-house_label = "311"
+body_color = Color(0.42, 0.68, 0.32, 1)
+roof_color = Color(0.26, 0.44, 0.18, 1)
+house_label = "316"
 
 [node name="MailboxF" parent="." unique_id=419945241 instance=ExtResource("5_mailbox")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0, 40.7)
-house_id = "house_311"
-house_label = "311"
+house_id = "house_316"
+house_label = "316"
 
 [node name="FenceA1" parent="." unique_id=1870710765 instance=ExtResource("8_fence")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0, -12.5)
@@ -479,6 +534,124 @@ surface_material_override/0 = SubResource("Material_tile_b")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 11.2)
 mesh = SubResource("BoxMesh_tile")
 surface_material_override/0 = SubResource("Material_tile_c")
+
+; --- Garden (House 316 front yard) -------------------------------------------
+; House 316 centre Z≈41.2. Yard spans Z≈38.5–44.0, X=0 (sidewalk) to X=-2.8 (fence).
+[node name="Garden316" type="Node3D" parent="."]
+
+; Bright soil patch — fills the whole front yard so it reads clearly from the camera
+[node name="GardenBed" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.06, 41.25)
+mesh = SubResource("BoxMesh_garden_bed")
+surface_material_override/0 = SubResource("Material_soil")
+
+; Back row of bushes — against the fence at X=-2.5
+[node name="Bush1" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 0.72, 39.4)
+mesh = SubResource("SphereMesh_bush")
+surface_material_override/0 = SubResource("Material_bush_dark")
+
+[node name="Bush2" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1.3, 0, 0, 0, 1.3, 0, 0, 0, 1.3, -2.3, 0.94, 41.3)
+mesh = SubResource("SphereMesh_bush")
+surface_material_override/0 = SubResource("Material_bush")
+
+[node name="Bush3" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, -2.4, 0.79, 43.2)
+mesh = SubResource("SphereMesh_bush")
+surface_material_override/0 = SubResource("Material_bush_dark")
+
+; Back flower row — between bushes, at X≈-2.0
+[node name="FlowerBedA1" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.375, 38.8)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_red")
+
+[node name="FlowerBedA2" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.375, 39.7)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_pink")
+
+[node name="FlowerBedA3" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.375, 40.6)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_purple")
+
+[node name="FlowerBedA4" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.375, 41.5)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_red")
+
+[node name="FlowerBedA5" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.375, 42.4)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_pink")
+
+[node name="FlowerBedA6" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.0, 0.375, 43.3)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_purple")
+
+; Front flower row — closer to the player at X≈-1.1
+[node name="FlowerBedB1" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.375, 39.2)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_pink")
+
+[node name="FlowerBedB2" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.375, 40.1)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_purple")
+
+[node name="FlowerBedB3" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.375, 41.0)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower")
+
+[node name="FlowerBedB4" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.375, 41.9)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_red")
+
+[node name="FlowerBedB5" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1, 0.375, 42.8)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_pink")
+
+; Terracotta pots by the gate, straddling the two rows
+[node name="Pot1" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.25, 39.0)
+mesh = SubResource("BoxMesh_pot")
+surface_material_override/0 = SubResource("Material_terracotta")
+
+[node name="Flower1" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.625, 39.0)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower")
+
+[node name="Pot2" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.25, 41.2)
+mesh = SubResource("BoxMesh_pot")
+surface_material_override/0 = SubResource("Material_terracotta")
+
+[node name="Flower2" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.625, 41.2)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_pink")
+
+[node name="Pot3" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.25, 43.4)
+mesh = SubResource("BoxMesh_pot")
+surface_material_override/0 = SubResource("Material_terracotta")
+
+[node name="Flower3" type="MeshInstance3D" parent="Garden316"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6, 0.625, 43.4)
+mesh = SubResource("BoxMesh_flower")
+surface_material_override/0 = SubResource("Material_flower_purple")
+
+; Mr. Hughes stands at the start of the route, near the player spawn
+[node name="MrHughes" parent="." instance=ExtResource("10_gossip")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.3, 0, -13)
 
 [node name="Player" parent="." unique_id=1571739222 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -14)
