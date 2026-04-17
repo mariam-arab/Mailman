@@ -17,7 +17,7 @@ var _flag_up: bool = false
 
 
 func prompt_text() -> String:
-	return "Tab — open bag to deliver"
+	return "Tab: open bag to deliver"
 
 
 func interact(player: Node) -> void:
