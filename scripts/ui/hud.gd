@@ -247,7 +247,7 @@ func _rebuild_envelopes() -> void:
 		var card := _make_envelope(letter, 0, 0)
 		card.set_meta("in_slot", true)
 		card.set_meta("slot_mailbox", _delivered_letters[letter])
-		card.scale    = Vector2(0.55, 0.55)
+		card.scale    = Vector2(0.70, 0.70)
 		card.modulate = Color(1, 1, 1, 0)          # start invisible — positioned by _update_delivery_slots
 		card.position = Vector2(-2000.0, -2000.0)  # off-screen until slot panel places it
 		envelopes_layer.add_child(card)
@@ -380,12 +380,14 @@ func _update_delivery_slots() -> void:
 				# Already exists — just update its position.
 				var sp: Panel = _slot_panels[node]
 				sp.position = screen_pos - sp.size * 0.5
-				# Snap any parked card to stay centred on the slot
+				# Snap any parked card to stay centred on the slot, above the slot panel
 				if _slotted_cards.has(node):
 					var sc: Panel = _slotted_cards[node]
 					if is_instance_valid(sc):
 						sc.position  = sp.position + sp.size * 0.5 - sc.size * sc.scale * 0.5
 						sc.modulate.a = 1.0
+						if sc.get_index() <= sp.get_index():
+							envelopes_layer.move_child(sc, sp.get_index() + 1)
 			else:
 				# Came into frame — create and fade in.
 				var house_lbl: String = node.house_label if "house_label" in node else "Mailbox"
@@ -396,12 +398,13 @@ func _update_delivery_slots() -> void:
 				_slot_panels[node] = sp
 				var tw := create_tween()
 				tw.tween_property(sp, "modulate:a", 1.0, 0.25)
-				# If a card is already parked here, position and show it
+				# If a card is already parked here, position and show it above the slot panel
 				if _slotted_cards.has(node):
 					var sc: Panel = _slotted_cards[node]
 					if is_instance_valid(sc):
 						sc.position  = sp.position + sp.size * 0.5 - sc.size * sc.scale * 0.5
 						sc.modulate.a = 1.0
+						envelopes_layer.move_child(sc, sp.get_index() + 1)
 		else:
 			if _slot_panels.has(node):
 				# Left frame — fade out and remove.
@@ -575,11 +578,11 @@ func _deliver_dragged(mailbox) -> void:
 	card.set_meta("was_in_slot", false)
 	_slotted_cards[mailbox] = card
 	_delivered_letters[letter] = mailbox
-	envelopes_layer.move_child(card, 0)  # behind bag cards so it doesn't block them
+	envelopes_layer.move_child(card, sp.get_index() + 1)  # above slot panel so it's visible
 	var tw := create_tween()
 	tw.tween_property(card, "position", target, 0.18)\
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(card, "scale", Vector2(0.55, 0.55), 0.14)\
+	tw.tween_property(card, "scale", Vector2(0.70, 0.70), 0.14)\
 		.set_trans(Tween.TRANS_CUBIC)
 	var mb = mailbox
 	var pl = _player
