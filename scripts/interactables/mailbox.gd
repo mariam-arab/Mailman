@@ -17,9 +17,7 @@ var _flag_up: bool = false
 
 
 func prompt_text() -> String:
-	if GameState.get_selected_letter() != null:
-		return "E: Deliver letter"
-	return "E: Open mailbox"
+	return "Tab — open bag to deliver"
 
 
 func interact(player: Node) -> void:

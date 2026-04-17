@@ -1,66 +1,133 @@
 extends CanvasLayer
-## HUD for Special Delivery.
-## Tab toggles the mail overlay. No keyboard nav — delivery is drag-only:
-## grab an envelope, drop it onto the mailbox slot that appears above the
-## nearest mailbox in world space. Right-click flips. Drag to the bottom
-## edge dismisses back to the bag. Envelope positions persist across toggles.
+## HUD for Special Delivery — visual redesign.
+## Tab opens the mail overlay: 3D world dims, themed envelopes fan at the bottom.
+## Click an envelope to pull it up into the workspace (max 2 at once).
+## Drag any envelope onto a mailbox slot to deliver. Right-click to flip.
 
-@onready var stamp_row: HBoxContainer   = $StampRow
-@onready var prompt_label: Label        = $PromptLabel
-@onready var inspection: Control        = $Inspection
-@onready var envelopes_layer: Control   = $Inspection/EnvelopesLayer
-@onready var notebook_node: Panel       = $Inspection/Notebook
-@onready var notebook_content: Label    = $Inspection/Notebook/Content
-@onready var nb_prev: Label             = $Inspection/Notebook/PagePrev
-@onready var nb_next: Label             = $Inspection/Notebook/PageNext
-@onready var pager_hint: Label          = $Inspection/PagerHint
-@onready var summary: Control           = $Summary
-@onready var summary_label: Label       = $Summary/Center/SummaryLabel
-@onready var dialogue_panel: Panel      = $DialoguePanel
-@onready var dialogue_speaker: Label    = $DialoguePanel/Speaker
-@onready var dialogue_text: Label       = $DialoguePanel/Text
-@onready var dialogue_hint: Label       = $DialoguePanel/Hint
+@onready var stamp_row:        HBoxContainer = $StampRow
+@onready var stamp_counter:    Label         = $StampCounter
+@onready var prompt_label:     Label         = $PromptLabel
+@onready var inspection:       Control       = $Inspection
+@onready var envelopes_layer:  Control       = $Inspection/EnvelopesLayer
+@onready var notebook_node:    Panel         = $Inspection/Notebook
+@onready var notebook_content: Label         = $Inspection/Notebook/Content
+@onready var nb_prev:          Label         = $Inspection/Notebook/PagePrev
+@onready var nb_next:          Label         = $Inspection/Notebook/PageNext
+@onready var tape_bar:         Panel         = $Inspection/TapeBar
+@onready var pager_hint:       Label         = $Inspection/TapeBar/PagerHint
+@onready var summary:          Control       = $Summary
+@onready var summary_label:    Label         = $Summary/Center/SummaryLabel
+@onready var dialogue_panel:   Panel         = $DialoguePanel
+@onready var dialogue_speaker: Label         = $DialoguePanel/Speaker
+@onready var dialogue_text:    Label         = $DialoguePanel/Text
+@onready var dialogue_hint:    Label         = $DialoguePanel/Hint
 
-var _player: Node               = null
-var _showing_inspection: bool   = false
+# -- envelope themes -----------------------------------------------------------
 
-# Dialogue
-var _dialogue_lines: Array      = []
-var _dialogue_idx: int          = 0
-var _nearby_interactable        = null
-var _cards: Array               = []
+enum EnvTheme { CREAM, KRAFT, AIRMAIL, OFFICIAL, SEALED, AGED }
 
-# Drag
+const THEME_DATA := {
+	EnvTheme.CREAM: {
+		"bg":         Color(0.97, 0.93, 0.85, 1),
+		"border":     Color(0.68, 0.52, 0.32, 1),
+		"ink":        Color(0.22, 0.14, 0.08, 1),
+		"stamp_bg":   Color(0.28, 0.58, 0.32, 1),
+		"stamp_text": "POSTES\nCANADA",
+		"tracker":    Color(0.28, 0.62, 0.35, 1),
+	},
+	EnvTheme.KRAFT: {
+		"bg":         Color(0.74, 0.60, 0.38, 1),
+		"border":     Color(0.52, 0.36, 0.16, 1),
+		"ink":        Color(0.14, 0.08, 0.02, 1),
+		"stamp_bg":   Color(0.85, 0.65, 0.18, 1),
+		"stamp_text": "CANADA\n5c",
+		"tracker":    Color(0.85, 0.65, 0.18, 1),
+	},
+	EnvTheme.AIRMAIL: {
+		"bg":         Color(0.92, 0.96, 1.0, 1),
+		"border":     Color(0.22, 0.38, 0.75, 1),
+		"ink":        Color(0.10, 0.18, 0.52, 1),
+		"stamp_bg":   Color(0.78, 0.18, 0.18, 1),
+		"stamp_text": "CANADA\n8c",
+		"tracker":    Color(0.25, 0.42, 0.78, 1),
+	},
+	EnvTheme.OFFICIAL: {
+		"bg":         Color(0.98, 0.97, 0.94, 1),
+		"border":     Color(0.48, 0.42, 0.32, 1),
+		"ink":        Color(0.18, 0.14, 0.10, 1),
+		"stamp_bg":   Color(0.78, 0.22, 0.22, 1),
+		"stamp_text": "CANADA\n6c",
+		"tracker":    Color(0.78, 0.22, 0.22, 1),
+	},
+	EnvTheme.SEALED: {
+		"bg":         Color(0.97, 0.93, 0.87, 1),
+		"border":     Color(0.52, 0.32, 0.18, 1),
+		"ink":        Color(0.22, 0.14, 0.08, 1),
+		"stamp_bg":   Color(0.52, 0.28, 0.62, 1),
+		"stamp_text": "CANADA\n4c",
+		"tracker":    Color(0.52, 0.28, 0.62, 1),
+		"seal_color": Color(0.72, 0.14, 0.14, 1),
+	},
+	EnvTheme.AGED: {
+		"bg":         Color(0.88, 0.82, 0.62, 1),
+		"border":     Color(0.48, 0.36, 0.18, 1),
+		"ink":        Color(0.24, 0.16, 0.08, 1),
+		"stamp_bg":   Color(0.62, 0.38, 0.22, 1),
+		"stamp_text": "CANADA\n3c",
+		"tracker":    Color(0.62, 0.38, 0.22, 1),
+	},
+}
+
+func _letter_theme(letter) -> int:
+	match letter.id:
+		"letter_01": return EnvTheme.KRAFT
+		"letter_02": return EnvTheme.OFFICIAL
+		"letter_03": return EnvTheme.CREAM
+		"letter_04": return EnvTheme.AIRMAIL
+		"letter_05": return EnvTheme.SEALED
+		"letter_06": return EnvTheme.AGED
+		_:           return EnvTheme.CREAM
+
+
+# -- state ---------------------------------------------------------------------
+
+var _player: Node              = null
+var _showing_inspection: bool  = false
+
+var _dialogue_lines: Array     = []
+var _dialogue_idx: int         = 0
+var _nearby_interactable       = null
+var _cards: Array              = []
+var _delivered_count: int      = 0
+
+const MAX_PULLED                := 2
+const DRAG_THRESHOLD            := 8.0
+var _pull_cards: Array          = []
+var _press_card                 = null
+var _press_pos: Vector2         = Vector2.ZERO
+var _is_dragging: bool          = false
+var _press_was_in_slot: bool    = false
+
 var _drag_card                  = null
 var _drag_offset: Vector2       = Vector2.ZERO
 
-# Persisted envelope positions (letter.id → Vector2)
-var _saved_positions: Dictionary = {}
+var _slot_panels: Dictionary   = {}
+var _camera: Camera3D          = null
 
-# Delivery slots projected from 3D mailboxes in frame (interactable → Panel)
-var _slot_panels: Dictionary    = {}
-var _camera: Camera3D           = null
-
-# Letters that have been delivered but can still be dragged back (Mail → mailbox node)
 var _delivered_letters: Dictionary = {}
-# Cards parked in delivery slots (mailbox node → Panel card)
-var _slotted_cards: Dictionary  = {}
+var _slotted_cards:     Dictionary = {}
 
-# Notebook
 const _NB_PAGES := [
-	"Today's Route\n\n• House A — The Baker\n• House B — Hockey Family\n• House E — The Professor",
-	"Delivery Tips\n\nRight-click an envelope\nto read the clue on\nthe back.",
-	"Reminders\n\nDrag an envelope to the\nbottom of the screen to\nput it back in the bag.",
+	"Today's Route\n\n311 - L. Hughes\n312 - Thomas (Tom)\n313 - K. Lyne\n314 - J. Sydney\n315 - M. Hughes\n316 - Linda M.",
+	"How to Deliver\n\nWalk near a mailbox.\nA slot appears above it.\n\nOpen your bag (Tab),\nthen drag an envelope\nonto the slot.",
+	"Tips\n\nRight-click an envelope\nto open it and read\nthe message inside.\n\nDrag to the bottom\nedge to put a letter\nback in your bag.",
 ]
 var _nb_page: int = 0
 
-# Styles
-var _sty_env:     StyleBoxFlat
-var _sty_env_bk:  StyleBoxFlat
-var _sty_nb:      StyleBoxFlat
+var _sty_nb: StyleBoxFlat
 
 
-# ── init ──────────────────────────────────────────────────────────────────────
+# -- init ----------------------------------------------------------------------
 
 func _ready() -> void:
 	add_to_group("hud")
@@ -70,6 +137,7 @@ func _ready() -> void:
 	summary.visible        = false
 	dialogue_panel.visible = false
 	prompt_label.text      = ""
+	stamp_counter.text     = ""
 	GameState.day_started.connect(_on_day_started)
 	GameState.day_ended.connect(_on_day_ended)
 	GameState.letter_delivered.connect(_on_letter_delivered)
@@ -77,27 +145,9 @@ func _ready() -> void:
 
 
 func _build_styles() -> void:
-	_sty_env = StyleBoxFlat.new()
-	_sty_env.bg_color      = Color(0.96, 0.91, 0.78, 1)
-	_sty_env.border_color  = Color(0.65, 0.48, 0.30, 1)
-	_sty_env.set_border_width_all(2)
-	_sty_env.set_corner_radius_all(3)
-	_sty_env.shadow_color  = Color(0, 0, 0, 0.32)
-	_sty_env.shadow_size   = 10
-	_sty_env.shadow_offset = Vector2(3, 5)
-
-	_sty_env_bk = StyleBoxFlat.new()
-	_sty_env_bk.bg_color      = Color(0.88, 0.82, 0.66, 1)
-	_sty_env_bk.border_color  = Color(0.55, 0.38, 0.22, 1)
-	_sty_env_bk.set_border_width_all(2)
-	_sty_env_bk.set_corner_radius_all(3)
-	_sty_env_bk.shadow_color  = Color(0, 0, 0, 0.32)
-	_sty_env_bk.shadow_size   = 10
-	_sty_env_bk.shadow_offset = Vector2(3, 5)
-
 	_sty_nb = StyleBoxFlat.new()
-	_sty_nb.bg_color      = Color(0.96, 0.93, 0.85, 1)
-	_sty_nb.border_color  = Color(0.60, 0.44, 0.28, 1)
+	_sty_nb.bg_color      = Color(0.94, 0.89, 0.74, 1)
+	_sty_nb.border_color  = Color(0.58, 0.42, 0.22, 1)
 	_sty_nb.set_border_width_all(2)
 	_sty_nb.set_corner_radius_all(4)
 	_sty_nb.shadow_color  = Color(0, 0, 0, 0.28)
@@ -105,15 +155,19 @@ func _build_styles() -> void:
 	_sty_nb.shadow_offset = Vector2(2, 4)
 	notebook_node.add_theme_stylebox_override("panel", _sty_nb)
 
+	var sty_tape := StyleBoxFlat.new()
+	sty_tape.bg_color = Color(0.36, 0.38, 0.24, 0.92)
+	tape_bar.add_theme_stylebox_override("panel", sty_tape)
+
 
 func _build_notebook() -> void:
 	_nb_page = 0
 	notebook_content.text = _NB_PAGES[0]
 	nb_prev.text = ""
-	nb_next.text = "▶" if _NB_PAGES.size() > 1 else ""
+	nb_next.text = ">" if _NB_PAGES.size() > 1 else ""
 
 
-# ── public API ────────────────────────────────────────────────────────────────
+# -- public API ----------------------------------------------------------------
 
 func bind_player(player: Node) -> void:
 	_player = player
@@ -148,7 +202,7 @@ func open_dialogue(lines: Array, speaker_name: String = "") -> void:
 func _show_dialogue_line() -> void:
 	dialogue_text.text = _dialogue_lines[_dialogue_idx]
 	var last: bool = _dialogue_idx >= _dialogue_lines.size() - 1
-	dialogue_hint.text = "E — close" if last else "E — continue"
+	dialogue_hint.text = "E - close" if last else "E - continue"
 
 
 func _close_dialogue() -> void:
@@ -161,10 +215,9 @@ func _close_dialogue() -> void:
 	)
 
 
-# ── input ─────────────────────────────────────────────────────────────────────
+# -- input ---------------------------------------------------------------------
 
 func _input(event: InputEvent) -> void:
-	# Dialogue takes priority — consume E so level.gd doesn't also fire.
 	if _dialogue_lines.size() > 0 and event.is_action_pressed("interact"):
 		_dialogue_idx += 1
 		if _dialogue_idx >= _dialogue_lines.size():
@@ -185,19 +238,68 @@ func _input(event: InputEvent) -> void:
 		match event.button_index:
 			MOUSE_BUTTON_LEFT:
 				if event.pressed:
-					_try_start_drag(event.global_position)
+					_on_left_press(event.global_position)
 				else:
-					_end_drag(event.global_position)
+					_on_left_release(event.global_position)
 			MOUSE_BUTTON_RIGHT:
 				if event.pressed:
 					_try_flip_at(event.global_position)
 					_try_notebook_page(event.global_position)
 
 	elif event is InputEventMouseMotion:
-		if _drag_card != null:
+		if _press_card != null and not _is_dragging:
+			if event.global_position.distance_to(_press_pos) > DRAG_THRESHOLD:
+				_start_drag()
+		if _is_dragging and _drag_card != null:
 			_drag_card.global_position = event.global_position - _drag_offset
 			_update_slot_highlight(event.global_position)
 			get_viewport().set_input_as_handled()
+
+
+func _start_drag() -> void:
+	_is_dragging = true
+	_drag_card   = _press_card
+	_drag_offset = _press_pos - _press_card.global_position
+	if _press_was_in_slot:
+		var mb = _drag_card.get_meta("slot_mailbox", null)
+		if mb:
+			_slotted_cards.erase(mb)
+		_drag_card.set_meta("in_slot", false)
+		_drag_card.set_meta("slot_mailbox", null)
+	_drag_card.set_meta("was_in_slot", _press_was_in_slot)
+	_pull_cards.erase(_drag_card)
+	envelopes_layer.move_child(_drag_card, -1)
+	var tw := create_tween()
+	tw.tween_property(_drag_card, "scale", Vector2(1.04, 1.04), 0.08)
+
+
+func _on_left_press(pos: Vector2) -> void:
+	var children := envelopes_layer.get_children()
+	for i in range(children.size() - 1, -1, -1):
+		var card = children[i]
+		if _slot_panels.values().has(card):
+			continue
+		if _hit(card, pos):
+			_press_card        = card
+			_press_pos         = pos
+			_is_dragging       = false
+			_press_was_in_slot = card.get_meta("in_slot", false)
+			return
+
+
+func _on_left_release(pos: Vector2) -> void:
+	if _is_dragging and _drag_card != null:
+		_end_drag(pos)
+	elif _press_card != null:
+		_on_card_click(_press_card)
+	_press_card  = null
+	_is_dragging = false
+
+
+func _on_card_click(card: Panel) -> void:
+	if card.get_meta("in_slot", false):
+		return
+	_toggle_pull_card(card)
 
 
 func _toggle_inspection() -> void:
@@ -205,13 +307,15 @@ func _toggle_inspection() -> void:
 		return
 	if _showing_inspection:
 		_showing_inspection = false
-		_drag_card = null
+		_drag_card   = null
+		_press_card  = null
+		_is_dragging = false
+		_pull_cards.clear()
 		for mb in _slot_panels:
 			var sp: Panel = _slot_panels[mb]
 			var tw := create_tween()
 			tw.tween_property(sp, "modulate:a", 0.0, 0.15)
 		_slot_panels.clear()
-		# Fade out slotted cards — they will be recreated on next open
 		for mb in _slotted_cards:
 			var sc: Panel = _slotted_cards[mb]
 			if is_instance_valid(sc):
@@ -229,12 +333,13 @@ func _toggle_inspection() -> void:
 		_rebuild_envelopes()
 
 
-# ── envelopes ─────────────────────────────────────────────────────────────────
+# -- envelopes -----------------------------------------------------------------
 
 func _rebuild_envelopes() -> void:
 	for child in envelopes_layer.get_children():
 		child.queue_free()
 	_cards.clear()
+	_pull_cards.clear()
 	_slot_panels.clear()
 	_slotted_cards.clear()
 	var bag := GameState.mail_bag
@@ -242,38 +347,96 @@ func _rebuild_envelopes() -> void:
 		var card := _make_envelope(bag[i], i, bag.size())
 		envelopes_layer.add_child(card)
 		_cards.append(card)
-	# Recreate cards for letters already in delivery slots
 	for letter in _delivered_letters:
 		var card := _make_envelope(letter, 0, 0)
 		card.set_meta("in_slot", true)
 		card.set_meta("slot_mailbox", _delivered_letters[letter])
-		card.scale    = Vector2(0.70, 0.70)
-		card.modulate = Color(1, 1, 1, 0)          # start invisible — positioned by _update_delivery_slots
-		card.position = Vector2(-2000.0, -2000.0)  # off-screen until slot panel places it
+		card.scale    = Vector2(0.55, 0.55)
+		card.modulate = Color(1, 1, 1, 0)
+		card.position = Vector2(-2000.0, -2000.0)
 		envelopes_layer.add_child(card)
-		envelopes_layer.move_child(card, 0)        # behind bag cards
+		envelopes_layer.move_child(card, 0)
 		_slotted_cards[_delivered_letters[letter]] = card
 	_slide_envelopes_in()
 	_update_pager_hint()
 
 
-func _rest_position(index: int, total: int) -> Vector2:
-	var vp    := get_viewport().get_visible_rect().size
-	var ew    := 268.0
-	var gap   := 28.0
-	var total_w := total * ew + (total - 1) * gap
-	var x     := (vp.x - total_w) * 0.5 + index * (ew + gap)
-	var y     := vp.y * 0.62
+# -- fan layout ----------------------------------------------------------------
+
+func _fan_position(index: int, total: int) -> Vector2:
+	var vp   := get_viewport().get_visible_rect().size
+	const EW := 260.0
+	var step := clampf(vp.x * 0.55 / maxf(total - 1, 1), 70.0, 120.0)
+	var total_w := EW + (total - 1) * step
+	var x    := (vp.x - total_w) * 0.5 + index * step
+	var y    := vp.y - 74.0
 	return Vector2(x, y)
 
 
-func _envelope_tilt(id: String) -> float:
-	return ((id.hash() % 13) - 6) * 0.75
+func _fan_tilt(index: int, total: int) -> float:
+	if total <= 1:
+		return 0.0
+	var t := float(index) / float(total - 1)
+	return lerp(-13.0, 13.0, t)
 
+
+func _pulled_position(pull_index: int, total_pulled: int) -> Vector2:
+	var vp   := get_viewport().get_visible_rect().size
+	const EW := 260.0
+	const GAP := 44.0
+	var total_w := total_pulled * EW + (total_pulled - 1) * GAP
+	var x    := (vp.x - total_w) * 0.5 + pull_index * (EW + GAP)
+	var y    := vp.y * 0.20
+	return Vector2(x, y)
+
+
+func _toggle_pull_card(card: Panel) -> void:
+	if _pull_cards.has(card):
+		_pull_cards.erase(card)
+		var idx := _cards.find(card)
+		if idx >= 0:
+			var tw := create_tween()
+			tw.set_parallel(true)
+			tw.tween_property(card, "position", _fan_position(idx, _cards.size()), 0.24) \
+				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			tw.tween_property(card, "rotation_degrees", _fan_tilt(idx, _cards.size()), 0.20)
+		_reposition_pull_cards()
+	else:
+		if _pull_cards.size() >= MAX_PULLED:
+			var old: Panel = _pull_cards[0]
+			_pull_cards.erase(old)
+			var oi := _cards.find(old)
+			if oi >= 0:
+				var ot := create_tween()
+				ot.set_parallel(true)
+				ot.tween_property(old, "position", _fan_position(oi, _cards.size()), 0.18) \
+					.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+				ot.tween_property(old, "rotation_degrees", _fan_tilt(oi, _cards.size()), 0.16)
+		_pull_cards.append(card)
+		envelopes_layer.move_child(card, -1)
+		_reposition_pull_cards()
+
+
+func _reposition_pull_cards() -> void:
+	for i in _pull_cards.size():
+		var card = _pull_cards[i]
+		var dest := _pulled_position(i, _pull_cards.size())
+		var tw := create_tween()
+		tw.set_parallel(true)
+		tw.tween_property(card, "position", dest, 0.22) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tw.tween_property(card, "rotation_degrees", 0.0, 0.18)
+
+
+# -- envelope construction -----------------------------------------------------
 
 func _make_envelope(letter, index: int, total: int) -> Panel:
-	const EW := 200.0
-	const EH := 128.0
+	const EW := 260.0
+	const EH := 165.0
+
+	var theme_id := _letter_theme(letter)
+	var td: Dictionary = THEME_DATA[theme_id]
+
 	var card := Panel.new()
 	card.custom_minimum_size = Vector2(EW, EH)
 	card.size                = Vector2(EW, EH)
@@ -281,83 +444,200 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 	card.mouse_filter        = Control.MOUSE_FILTER_PASS
 	card.set_meta("letter",       letter)
 	card.set_meta("showing_back", false)
+	card.set_meta("in_slot",      false)
+	card.set_meta("slot_mailbox", null)
+	card.set_meta("was_in_slot",  false)
+	card.set_meta("theme_id",     theme_id)
 
-	var rest: Vector2 = _saved_positions.get(letter.id, _rest_position(index, total))
-	card.position         = rest
-	card.rotation_degrees = _envelope_tilt(letter.id)
+	card.position         = _fan_position(index, total)
+	card.rotation_degrees = _fan_tilt(index, total)
 
-	# Front — sender block (top-left) + recipient block (centre-bottom)
+	var sty_f := StyleBoxFlat.new()
+	sty_f.bg_color      = td["bg"]
+	sty_f.border_color  = td["border"]
+	sty_f.set_border_width_all(2)
+	sty_f.set_corner_radius_all(4)
+	sty_f.shadow_color  = Color(0, 0, 0, 0.35)
+	sty_f.shadow_size   = 14
+	sty_f.shadow_offset = Vector2(3, 6)
+	card.add_theme_stylebox_override("panel", sty_f)
+	card.set_meta("sty_front", sty_f)
+
+	var sty_b := StyleBoxFlat.new()
+	sty_b.bg_color      = td["bg"].darkened(0.08)
+	sty_b.border_color  = td["border"]
+	sty_b.set_border_width_all(2)
+	sty_b.set_corner_radius_all(4)
+	sty_b.shadow_color  = Color(0, 0, 0, 0.35)
+	sty_b.shadow_size   = 14
+	sty_b.shadow_offset = Vector2(3, 6)
+	card.set_meta("sty_back", sty_b)
+
+	if theme_id == EnvTheme.AIRMAIL:
+		_add_airmail_stripes(card, EW, EH)
+
 	var front := Control.new()
-	front.name = "Front"
+	front.name        = "Front"
 	front.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	front.mouse_filter = Control.MOUSE_FILTER_PASS
 
-	# Sender block (top-left)
-	var from_box := VBoxContainer.new()
-	from_box.name = "FromBox"
-	from_box.set_anchor(SIDE_LEFT,   0.0); from_box.set_anchor(SIDE_TOP,    0.0)
-	from_box.set_anchor(SIDE_RIGHT,  0.6); from_box.set_anchor(SIDE_BOTTOM, 0.5)
-	from_box.offset_left = 10; from_box.offset_top = 10
-	from_box.offset_right = -4; from_box.offset_bottom = 0
-	from_box.add_theme_constant_override("separation", 1)
-	var sn := Label.new(); sn.name = "SenderName"
-	sn.autowrap_mode = TextServer.AUTOWRAP_WORD
-	sn.add_theme_font_size_override("font_size", 9)
-	sn.add_theme_color_override("font_color", Color(0.35, 0.24, 0.14, 1))
-	var sa := Label.new(); sa.name = "SenderAddr"
-	sa.autowrap_mode = TextServer.AUTOWRAP_WORD
-	sa.add_theme_font_size_override("font_size", 8)
-	sa.add_theme_color_override("font_color", Color(0.48, 0.34, 0.22, 1))
-	from_box.add_child(sn); from_box.add_child(sa)
-	front.add_child(from_box)
+	var sender := Label.new()
+	sender.name          = "Sender"
+	sender.position      = Vector2(16, 12)
+	sender.size          = Vector2(160, 36)
+	sender.autowrap_mode = TextServer.AUTOWRAP_WORD
+	sender.add_theme_font_size_override("font_size", 9)
+	sender.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.38))
 
-	# Recipient block (centre, lower half)
-	var to_box := VBoxContainer.new()
-	to_box.name = "ToBox"
-	to_box.set_anchor(SIDE_LEFT,   0.0); to_box.set_anchor(SIDE_TOP,    0.42)
-	to_box.set_anchor(SIDE_RIGHT,  1.0); to_box.set_anchor(SIDE_BOTTOM, 1.0)
-	to_box.offset_left = 12; to_box.offset_top = 0
-	to_box.offset_right = -12; to_box.offset_bottom = -10
-	to_box.add_theme_constant_override("separation", 2)
-	var rn := Label.new(); rn.name = "RecipientName"
-	rn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	rn.autowrap_mode = TextServer.AUTOWRAP_WORD
-	rn.add_theme_font_size_override("font_size", 13)
-	rn.add_theme_color_override("font_color", Color(0.12, 0.08, 0.04, 1))
-	var ra := Label.new(); ra.name = "RecipientAddr"
-	ra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ra.autowrap_mode = TextServer.AUTOWRAP_WORD
-	ra.add_theme_font_size_override("font_size", 11)
-	ra.add_theme_color_override("font_color", Color(0.25, 0.16, 0.10, 1))
-	to_box.add_child(rn); to_box.add_child(ra)
-	front.add_child(to_box)
+	var addr := Label.new()
+	addr.name                 = "Address"
+	addr.position             = Vector2(14, 60)
+	addr.size                 = Vector2(EW - 28.0, 62.0)
+	addr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	addr.autowrap_mode        = TextServer.AUTOWRAP_WORD
+	addr.add_theme_font_size_override("font_size", 17)
+	addr.add_theme_color_override("font_color", td["ink"])
 
-	# Back — message (shown when envelope is opened)
+	var recip := Label.new()
+	recip.name                 = "Recipient"
+	recip.position             = Vector2(14, 128)
+	recip.size                 = Vector2(EW - 28.0, 24.0)
+	recip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	recip.add_theme_font_size_override("font_size", 11)
+	recip.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.28))
+
+	front.add_child(sender)
+	front.add_child(addr)
+	front.add_child(recip)
+
 	var back := Control.new()
-	back.name = "Back"; back.visible = false
+	back.name         = "Back"
+	back.visible      = false
 	back.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	back.mouse_filter = Control.MOUSE_FILTER_PASS
+
 	var bv := VBoxContainer.new()
 	bv.name = "VBox"
 	bv.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bv.offset_left = 18; bv.offset_top = 16; bv.offset_right = -18; bv.offset_bottom = -16
 	bv.add_theme_constant_override("separation", 8)
+
 	var ch := Label.new()
-	ch.text = "— message —"
+	ch.text                 = "-- scrawled on the back --"
 	ch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ch.add_theme_font_size_override("font_size", 10)
-	ch.add_theme_color_override("font_color", Color(0.42, 0.30, 0.20, 1))
-	var ml := Label.new(); ml.name = "Message"
-	ml.autowrap_mode = TextServer.AUTOWRAP_WORD
-	ml.add_theme_font_size_override("font_size", 11)
-	ml.add_theme_color_override("font_color", Color(0.18, 0.12, 0.08, 1))
-	bv.add_child(ch); bv.add_child(ml)
+	ch.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.48))
+
+	var cl := Label.new()
+	cl.name          = "Clue"
+	cl.autowrap_mode = TextServer.AUTOWRAP_WORD
+	cl.add_theme_font_size_override("font_size", 11)
+	cl.add_theme_color_override("font_color", td["ink"])
+
+	bv.add_child(ch)
+	bv.add_child(cl)
 	back.add_child(bv)
 
 	card.add_child(front)
 	card.add_child(back)
+
+	_add_stamp(card, td["stamp_bg"], td["stamp_text"], EW)
+	if theme_id == EnvTheme.SEALED:
+		_add_wax_seal(card, td["seal_color"], EH)
+
 	_apply_face(card, letter, false)
 	return card
+
+
+func _add_airmail_stripes(card: Panel, _ew: float, eh: float) -> void:
+	const SW := 5.0
+	var colors := [
+		Color(0.18, 0.26, 0.72, 1),
+		Color(0.92, 0.96, 1.0, 0.9),
+		Color(0.78, 0.14, 0.14, 1),
+	]
+	for i in 3:
+		var cr := ColorRect.new()
+		cr.color        = colors[i]
+		cr.position     = Vector2(i * SW, 0.0)
+		cr.size         = Vector2(SW, eh)
+		cr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		card.add_child(cr)
+	var par := Label.new()
+	par.text         = "PAR AVION"
+	par.position     = Vector2(3.0 * SW + 5.0, 9.0)
+	par.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	par.add_theme_font_size_override("font_size", 9)
+	par.add_theme_color_override("font_color", Color(0.10, 0.18, 0.62, 1))
+	card.add_child(par)
+
+
+func _add_stamp(card: Panel, stamp_bg: Color, stamp_text: String, card_w: float) -> void:
+	const SW := 42.0
+	const SH := 52.0
+	var outer := Panel.new()
+	outer.name         = "Stamp"
+	outer.position     = Vector2(card_w - SW - 10.0, 9.0)
+	outer.size         = Vector2(SW + 4.0, SH + 4.0)
+	outer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var sty_o := StyleBoxFlat.new()
+	sty_o.bg_color     = Color(0.97, 0.93, 0.85, 1)
+	sty_o.border_color = Color(0.80, 0.74, 0.60, 1)
+	sty_o.set_border_width_all(2)
+	sty_o.set_corner_radius_all(3)
+	outer.add_theme_stylebox_override("panel", sty_o)
+
+	var inner := Panel.new()
+	inner.position     = Vector2(2, 2)
+	inner.size         = Vector2(SW, SH)
+	inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sty_i := StyleBoxFlat.new()
+	sty_i.bg_color = stamp_bg
+	sty_i.set_corner_radius_all(2)
+	inner.add_theme_stylebox_override("panel", sty_i)
+
+	var lbl := Label.new()
+	lbl.text                 = stamp_text
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
+	lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	lbl.mouse_filter         = Control.MOUSE_FILTER_IGNORE
+	lbl.add_theme_font_size_override("font_size", 8)
+	lbl.add_theme_color_override("font_color", Color(1, 1, 1, 0.92))
+
+	inner.add_child(lbl)
+	outer.add_child(inner)
+	card.add_child(outer)
+
+
+func _add_wax_seal(card: Panel, seal_color: Color, card_h: float) -> void:
+	const R := 22.0
+	var seal := Panel.new()
+	seal.name         = "WaxSeal"
+	seal.position     = Vector2(20.0, card_h * 0.5 - R)
+	seal.size         = Vector2(R * 2.0, R * 2.0)
+	seal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var sty := StyleBoxFlat.new()
+	sty.bg_color     = seal_color
+	sty.set_corner_radius_all(R)
+	sty.shadow_color  = Color(0, 0, 0, 0.30)
+	sty.shadow_size   = 5
+	sty.shadow_offset = Vector2(1, 2)
+	seal.add_theme_stylebox_override("panel", sty)
+
+	var lbl := Label.new()
+	lbl.text                 = "seal"
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
+	lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	lbl.mouse_filter         = Control.MOUSE_FILTER_IGNORE
+	lbl.add_theme_font_size_override("font_size", 8)
+	lbl.add_theme_color_override("font_color", Color(1, 1, 1, 0.85))
+
+	seal.add_child(lbl)
+	card.add_child(seal)
 
 
 func _apply_face(card: Panel, letter, showing_back: bool) -> void:
@@ -366,17 +646,16 @@ func _apply_face(card: Panel, letter, showing_back: bool) -> void:
 	front.visible = not showing_back
 	back.visible  = showing_back
 	if showing_back:
-		card.add_theme_stylebox_override("panel", _sty_env_bk)
-		back.get_node("VBox/Message").text = letter.message
+		card.add_theme_stylebox_override("panel", card.get_meta("sty_back"))
+		back.get_node("VBox/Clue").text = letter.message
 	else:
-		card.add_theme_stylebox_override("panel", _sty_env)
-		front.get_node("FromBox/SenderName").text = letter.sender_name
-		front.get_node("FromBox/SenderAddr").text = letter.sender_address
-		front.get_node("ToBox/RecipientName").text = letter.recipient_name
-		front.get_node("ToBox/RecipientAddr").text = letter.address_line
+		card.add_theme_stylebox_override("panel", card.get_meta("sty_front"))
+		front.get_node("Sender").text    = "%s\n%s" % [letter.sender_name, letter.sender_address]
+		front.get_node("Address").text   = letter.address_line
+		front.get_node("Recipient").text = letter.recipient_name
 
 
-# ── delivery slots (live, updated every frame while overlay is open) ──────────
+# -- delivery slots ------------------------------------------------------------
 
 func _process(_delta: float) -> void:
 	if _showing_inspection:
@@ -387,30 +666,25 @@ func _update_delivery_slots() -> void:
 	_camera = get_viewport().get_camera_3d()
 	if _camera == null:
 		return
-	var vp := get_viewport().get_visible_rect()
+	var vp        := get_viewport().get_visible_rect()
 	var prev_count := _slot_panels.size()
 
 	for node in get_tree().get_nodes_in_group("interactable"):
 		if not (node is InteractableObject) or not node.enabled:
 			continue
-		var world_pos: Vector3 = node.global_position + Vector3(0, 2.0, 0)
+		var world_pos:  Vector3 = node.global_position + Vector3(0, 2.0, 0)
 		var screen_pos: Vector2 = _camera.unproject_position(world_pos)
 
 		if vp.has_point(screen_pos):
 			if _slot_panels.has(node):
-				# Already exists — just update its position.
 				var sp: Panel = _slot_panels[node]
 				sp.position = screen_pos - sp.size * 0.5
-				# Snap any parked card to stay centred on the slot, above the slot panel
 				if _slotted_cards.has(node):
 					var sc: Panel = _slotted_cards[node]
 					if is_instance_valid(sc):
-						sc.position  = sp.position + sp.size * 0.5 - sc.size * sc.scale * 0.5
+						sc.position   = sp.position + sp.size * 0.5 - sc.size * sc.scale * 0.5
 						sc.modulate.a = 1.0
-						if sc.get_index() <= sp.get_index():
-							envelopes_layer.move_child(sc, sp.get_index() + 1)
 			else:
-				# Came into frame — create and fade in.
 				var house_lbl: String = node.house_label if "house_label" in node else "Mailbox"
 				var sp := _make_slot_panel(house_lbl, screen_pos)
 				sp.modulate.a = 0.0
@@ -419,16 +693,13 @@ func _update_delivery_slots() -> void:
 				_slot_panels[node] = sp
 				var tw := create_tween()
 				tw.tween_property(sp, "modulate:a", 1.0, 0.25)
-				# If a card is already parked here, position and show it above the slot panel
 				if _slotted_cards.has(node):
 					var sc: Panel = _slotted_cards[node]
 					if is_instance_valid(sc):
-						sc.position  = sp.position + sp.size * 0.5 - sc.size * sc.scale * 0.5
+						sc.position   = sp.position + sp.size * 0.5 - sc.size * sc.scale * 0.5
 						sc.modulate.a = 1.0
-						envelopes_layer.move_child(sc, sp.get_index() + 1)
 		else:
 			if _slot_panels.has(node):
-				# Left frame — fade out and remove.
 				var sp: Panel = _slot_panels[node]
 				_slot_panels.erase(node)
 				var tw := create_tween()
@@ -467,18 +738,20 @@ func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
 	p.set_meta("sty_hot",  sty_hot)
 
 	var icon := Label.new()
-	icon.text = "✉"
+	icon.text                 = "E"
 	icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	icon.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	icon.offset_top = 8; icon.offset_bottom = 40
+	icon.offset_top    = 8
+	icon.offset_bottom = 40
 	icon.add_theme_font_size_override("font_size", 20)
 	icon.add_theme_color_override("font_color", Color(0.88, 0.82, 0.65, 1))
 
 	var lbl := Label.new()
-	lbl.text = house_lbl
+	lbl.text                 = house_lbl
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	lbl.offset_top = -24; lbl.offset_bottom = -5
+	lbl.offset_top    = -24
+	lbl.offset_bottom = -5
 	lbl.add_theme_font_size_override("font_size", 11)
 	lbl.add_theme_color_override("font_color", Color(0.88, 0.84, 0.70, 1))
 
@@ -490,21 +763,20 @@ func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
 func _update_slot_highlight(mouse_pos: Vector2) -> void:
 	for mb in _slot_panels:
 		var sp: Panel = _slot_panels[mb]
-		var hot: bool = _hit(sp, mouse_pos)
 		sp.add_theme_stylebox_override("panel",
-			sp.get_meta("sty_hot") if hot else sp.get_meta("sty_idle"))
+			sp.get_meta("sty_hot") if _hit(sp, mouse_pos) else sp.get_meta("sty_idle"))
 
 
-# ── animations ────────────────────────────────────────────────────────────────
+# -- animations ----------------------------------------------------------------
 
 func _slide_envelopes_in() -> void:
 	var vph := get_viewport().get_visible_rect().size.y
 	for i in _cards.size():
 		var card = _cards[i]
 		var rest: Vector2 = card.position
-		card.position = Vector2(rest.x, vph + 220)
+		card.position = Vector2(rest.x, vph + 200.0)
 		var tw := create_tween()
-		tw.tween_property(card, "position", rest, 0.28 + i * 0.055)\
+		tw.tween_property(card, "position", rest, 0.26 + i * 0.05) \
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
@@ -516,49 +788,24 @@ func _slide_envelopes_out(on_done: Callable) -> void:
 	var tw := create_tween()
 	tw.set_parallel(true)
 	for i in _cards.size():
-		tw.tween_property(_cards[i], "position:y", vph + 220, 0.20 + i * 0.03)\
+		tw.tween_property(_cards[i], "position:y", vph + 200.0, 0.18 + i * 0.03) \
 			.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	tw.set_parallel(false)
 	tw.tween_callback(on_done)
 
 
-# ── drag ──────────────────────────────────────────────────────────────────────
-
-func _try_start_drag(pos: Vector2) -> void:
-	var children := envelopes_layer.get_children()
-	for i in range(children.size() - 1, -1, -1):
-		var card = children[i]
-		if _slot_panels.values().has(card):
-			continue
-		if _hit(card, pos):
-			var from_slot: bool = card.get_meta("in_slot", false)
-			if from_slot:
-				# Lift card out of its slot
-				var mb = card.get_meta("slot_mailbox", null)
-				if mb:
-					_slotted_cards.erase(mb)
-				card.set_meta("in_slot", false)
-				card.set_meta("slot_mailbox", null)
-			card.set_meta("was_in_slot", from_slot)
-			_drag_card   = card
-			_drag_offset = pos - card.global_position
-			envelopes_layer.move_child(card, -1)
-			var tw := create_tween()
-			tw.tween_property(card, "scale", Vector2(1.04, 1.04), 0.08)
-			return
-
+# -- drag ----------------------------------------------------------------------
 
 func _end_drag(pos: Vector2) -> void:
 	if _drag_card == null:
 		return
 	var was_in_slot: bool = _drag_card.get_meta("was_in_slot", false)
-	# Drop onto any mailbox slot → deliver to that mailbox
+
 	for mb in _slot_panels:
-		var sp: Panel = _slot_panels[mb]
-		if _hit(sp, pos):
+		if _hit(_slot_panels[mb], pos):
 			_deliver_dragged(mb)
 			return
-	# Drag to bottom edge → dismiss (remove from game entirely)
+
 	var vph := get_viewport().get_visible_rect().size.y
 	if pos.y > vph * 0.85:
 		if was_in_slot:
@@ -566,14 +813,19 @@ func _end_drag(pos: Vector2) -> void:
 			_delivered_letters.erase(_drag_card.get_meta("letter"))
 		_dismiss_card(_drag_card)
 	else:
-		# Dropped back into bag area
 		if was_in_slot:
 			GameState.un_deliver(_drag_card.get_meta("letter"))
 			_delivered_letters.erase(_drag_card.get_meta("letter"))
-		var tw := create_tween()
-		tw.tween_property(_drag_card, "scale", Vector2.ONE, 0.14)\
+		var card: Panel = _drag_card
+		var idx  := _cards.find(card)
+		var tw   := create_tween()
+		tw.set_parallel(true)
+		tw.tween_property(card, "scale", Vector2.ONE, 0.14) \
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-		_saved_positions[_drag_card.get_meta("letter").id] = _drag_card.position
+		if idx >= 0:
+			tw.tween_property(card, "position", _fan_position(idx, _cards.size()), 0.22) \
+				.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+			tw.tween_property(card, "rotation_degrees", _fan_tilt(idx, _cards.size()), 0.18)
 	_drag_card = null
 
 
@@ -586,24 +838,23 @@ func _deliver_dragged(mailbox) -> void:
 		_drag_card = null
 		return
 	var letter = _drag_card.get_meta("letter")
-	# Point GameState at this letter so mailbox.interact delivers the right one.
-	var idx := GameState.mail_bag.find(letter)
+	var idx    := GameState.mail_bag.find(letter)
 	if idx >= 0:
 		GameState.selected_index = idx
-	# Fly card to slot and shrink it to sit inside the slot panel — but keep it visible.
 	var target: Vector2 = sp.global_position + sp.size * 0.5 - _drag_card.size * 0.5
-	var card: Panel = _drag_card
+	var card: Panel     = _drag_card
 	_drag_card = null
-	card.set_meta("in_slot", true)
+	card.set_meta("in_slot",      true)
 	card.set_meta("slot_mailbox", mailbox)
-	card.set_meta("was_in_slot", false)
-	_slotted_cards[mailbox] = card
+	card.set_meta("was_in_slot",  false)
+	_slotted_cards[mailbox]    = card
 	_delivered_letters[letter] = mailbox
-	envelopes_layer.move_child(card, sp.get_index() + 1)  # above slot panel so it's visible
+	_pull_cards.erase(card)
+	envelopes_layer.move_child(card, 0)
 	var tw := create_tween()
-	tw.tween_property(card, "position", target, 0.18)\
+	tw.tween_property(card, "position", target, 0.18) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	tw.tween_property(card, "scale", Vector2(0.70, 0.70), 0.14)\
+	tw.tween_property(card, "scale", Vector2(0.55, 0.55), 0.14) \
 		.set_trans(Tween.TRANS_CUBIC)
 	var mb = mailbox
 	var pl = _player
@@ -613,7 +864,7 @@ func _deliver_dragged(mailbox) -> void:
 func _dismiss_card(card: Panel) -> void:
 	var vph := get_viewport().get_visible_rect().size.y
 	var tw  := create_tween()
-	tw.tween_property(card, "position:y", vph + 220, 0.22)\
+	tw.tween_property(card, "position:y", vph + 200.0, 0.22) \
 		.set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN)
 	tw.tween_callback(card.queue_free)
 	_cards.erase(card)
@@ -625,7 +876,7 @@ func _hit(card: Control, pos: Vector2) -> bool:
 	return Rect2(card.global_position, card.size * card.scale).has_point(pos)
 
 
-# ── flip ──────────────────────────────────────────────────────────────────────
+# -- flip ----------------------------------------------------------------------
 
 func _try_flip_at(pos: Vector2) -> void:
 	var children := envelopes_layer.get_children()
@@ -644,10 +895,10 @@ func _flip_envelope(card: Panel) -> void:
 		card.set_meta("showing_back", flipped)
 		_apply_face(card, card.get_meta("letter"), flipped)
 	)
-	tw.tween_property(card, "scale:x", 1.0, 0.10).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_property(card, "scale:x", card.scale.y, 0.10).set_trans(Tween.TRANS_CUBIC)
 
 
-# ── notebook ──────────────────────────────────────────────────────────────────
+# -- notebook ------------------------------------------------------------------
 
 func _try_notebook_page(pos: Vector2) -> void:
 	if not notebook_node.visible:
@@ -658,47 +909,49 @@ func _try_notebook_page(pos: Vector2) -> void:
 	var mid_x := notebook_node.global_position.x + notebook_node.size.x * 0.5
 	_nb_page = wrapi(_nb_page + (1 if pos.x >= mid_x else -1), 0, _NB_PAGES.size())
 	notebook_content.text = _NB_PAGES[_nb_page]
-	nb_prev.text = "◀" if _nb_page > 0 else ""
-	nb_next.text = "▶" if _nb_page < _NB_PAGES.size() - 1 else ""
+	nb_prev.text = "<" if _nb_page > 0 else ""
+	nb_next.text = ">" if _nb_page < _NB_PAGES.size() - 1 else ""
 
 
-# ── pager hint ────────────────────────────────────────────────────────────────
+# -- pager hint ----------------------------------------------------------------
 
 func _update_pager_hint() -> void:
 	var bag := GameState.mail_bag
-	if bag.is_empty():
-		pager_hint.text = "Bag empty"
+	if bag.is_empty() and _delivered_letters.is_empty():
+		pager_hint.text = "bag empty -- all letters delivered"
 		return
 	if _slot_panels.size() > 0:
-		pager_hint.text = "Drag a letter onto a mailbox slot to deliver   |   right-click to flip"
+		pager_hint.text = "drag envelope onto a mailbox slot to deliver   |   right-click to flip"
 	else:
-		pager_hint.text = "Tab to close   |   right-click to flip   |   walk near a mailbox to deliver"
+		pager_hint.text = "walk near a mailbox — slots appear above it   |   Tab to close"
 
 
-# ── signal handlers ───────────────────────────────────────────────────────────
+# -- signal handlers -----------------------------------------------------------
 
 func _on_selected_changed(_index: int, _letter) -> void:
-	pass  # selection no longer drives the overlay UI
+	pass
 
 
 func _on_day_started(_day: int, letters: Array) -> void:
 	for child in stamp_row.get_children():
 		child.queue_free()
-	for _i in letters.size():
-		stamp_row.add_child(_make_stamp_slot())
+	_delivered_count = 0
+	for letter in letters:
+		stamp_row.add_child(_make_stamp_slot(letter))
+	_update_stamp_counter(letters.size())
 
 
 func _on_letter_delivered(_letter, _house_id: String, was_correct: bool) -> void:
+	_delivered_count += 1
 	for slot in stamp_row.get_children():
 		if slot.get_meta("delivered", false) == false:
 			slot.set_meta("delivered", true)
-			var mark: Label = slot.get_node("Mark")
-			mark.text = "✓" if was_correct else "?"
+			var mark: Label = slot.get_meta("mark_label")
+			mark.text = "v" if was_correct else "x"
 			mark.add_theme_color_override("font_color",
-				Color(0.18, 0.55, 0.20) if was_correct else Color(0.55, 0.40, 0.18))
+				Color(1, 1, 1, 0.95) if was_correct else Color(1, 0.9, 0.4, 0.9))
 			break
-	_saved_positions.erase(_letter.id)
-	# Don't rebuild — the card is now parked in the delivery slot and stays visible.
+	_update_stamp_counter(stamp_row.get_child_count())
 
 
 func _on_day_ended(day: int, results: Array) -> void:
@@ -716,25 +969,54 @@ func _on_day_ended(day: int, results: Array) -> void:
 		_player.set_input_active(false)
 
 
-# ── stamp slot ────────────────────────────────────────────────────────────────
+# -- stamp slot ----------------------------------------------------------------
 
-func _make_stamp_slot() -> Panel:
-	var slot := Panel.new()
-	slot.custom_minimum_size = Vector2(40, 48)
-	var sb := StyleBoxFlat.new()
-	sb.bg_color     = Color(0.96, 0.91, 0.78, 1)
-	sb.border_color = Color(0.55, 0.30, 0.20, 1)
-	sb.border_width_left = 2; sb.border_width_right  = 2
-	sb.border_width_top  = 2; sb.border_width_bottom = 2
-	sb.corner_radius_top_left    = 2; sb.corner_radius_top_right    = 2
-	sb.corner_radius_bottom_left = 2; sb.corner_radius_bottom_right = 2
-	slot.add_theme_stylebox_override("panel", sb)
+func _make_stamp_slot(letter = null) -> Control:
+	var theme_id := _letter_theme(letter) if letter != null else 0
+	var td: Dictionary = THEME_DATA[theme_id]
+
+	const OW := 40.0
+	const OH := 50.0
+
+	var outer := Control.new()
+	outer.custom_minimum_size = Vector2(OW, OH)
+
+	var p_outer := Panel.new()
+	p_outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	p_outer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sty_o := StyleBoxFlat.new()
+	sty_o.bg_color     = Color(0.97, 0.93, 0.85, 1)
+	sty_o.border_color = Color(0.80, 0.74, 0.60, 1)
+	sty_o.set_border_width_all(3)
+	sty_o.set_corner_radius_all(3)
+	p_outer.add_theme_stylebox_override("panel", sty_o)
+
+	var p_inner := Panel.new()
+	p_inner.position     = Vector2(4, 4)
+	p_inner.size         = Vector2(OW - 8.0, OH - 8.0)
+	p_inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sty_i := StyleBoxFlat.new()
+	sty_i.bg_color = td["tracker"]
+	sty_i.set_corner_radius_all(2)
+	p_inner.add_theme_stylebox_override("panel", sty_i)
+
 	var mark := Label.new()
-	mark.name = "Mark"; mark.text = ""
+	mark.name                 = "Mark"
+	mark.text                 = ""
 	mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	mark.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
 	mark.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	mark.add_theme_font_size_override("font_size", 28)
-	slot.add_child(mark)
-	slot.set_meta("delivered", false)
-	return slot
+	mark.mouse_filter         = Control.MOUSE_FILTER_IGNORE
+	mark.add_theme_font_size_override("font_size", 20)
+	mark.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
+
+	p_inner.add_child(mark)
+	outer.add_child(p_outer)
+	outer.add_child(p_inner)
+	outer.set_meta("delivered",  false)
+	outer.set_meta("mark_label", mark)
+	return outer
+
+
+func _update_stamp_counter(total: int) -> void:
+	stamp_counter.text = "%d / %d livre" % [_delivered_count, total]
