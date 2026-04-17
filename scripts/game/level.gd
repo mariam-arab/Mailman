@@ -17,7 +17,7 @@ const DAY_ONE_LETTERS := [
 		"sender_address": "14 Harbour Lane, Halifax",
 		"address_line": "?? Maple Street",
 		"recipient_description":
-			"For the household that smells faintly of the sea.",
+			"Thomas Heart",
 		"clue_text":
 			"Dear Thomas — your annual subscription renewal is enclosed. Tight lines! — The Editors",
 		"correct_house_id": "house_312",
@@ -29,9 +29,9 @@ const DAY_ONE_LETTERS := [
 		"sender_address": "8 Greenhouse Row, Burlington",
 		"address_line": "?? Maple Street",
 		"recipient_description":
-			"For the household whose front garden never sleeps.",
+			"Linda Michaels",
 		"clue_text":
-			"Dear Linda — Spring edition enclosed. New column on composting this month! — G.D.",
+			"",
 		"correct_house_id": "house_316",
 		"difficulty": 1,
 	},
@@ -41,9 +41,9 @@ const DAY_ONE_LETTERS := [
 		"sender_address": "22 Birchwood Drive, Ottawa",
 		"address_line": "?? Maple Street",
 		"recipient_description":
-			"A personal letter for the Sydney family.",
+			"J. Syndnet",
 		"clue_text":
-			"I'll be visiting Thursday. Put the kettle on. Don't tell anyone. — L.",
+			"",
 		"correct_house_id": "house_314",
 		"difficulty": 2,
 	},
@@ -53,9 +53,9 @@ const DAY_ONE_LETTERS := [
 		"sender_address": "5 Glamour Court, Toronto",
 		"address_line": "315 Maple Street",
 		"recipient_description":
-			"For M. Hughes at Number 315.",
+			"M. Hughes",
 		"clue_text":
-			"Your loyalty card is enclosed. You're overdue for a trim! XOXO — The Team",
+			"",
 		"correct_house_id": "house_315",
 		"difficulty": 1,
 	},
@@ -65,9 +65,9 @@ const DAY_ONE_LETTERS := [
 		"sender_address": "— return address withheld —",
 		"address_line": "313 Maple Street",
 		"recipient_description":
-			"For K. Lyne at Number 313.",
+			"For K. Lyne",
 		"clue_text":
-			"You know what this is about. We should talk. — A Friend",
+			"",
 		"correct_house_id": "house_313",
 		"difficulty": 1,
 	},
@@ -77,9 +77,9 @@ const DAY_ONE_LETTERS := [
 		"sender_address": "— return address withheld —",
 		"address_line": "311 Maple Street",
 		"recipient_description":
-			"For L. Hughes at Number 311.",
+			"For L. Hughes",
 		"clue_text":
-			"Don't tell Dad. See you Sunday. — M.",
+			"",
 		"correct_house_id": "house_311",
 		"difficulty": 1,
 	},
