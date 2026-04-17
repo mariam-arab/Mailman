@@ -5,7 +5,6 @@ class_name Mail
 
 @export var id: String = ""
 @export var sender_name: String = ""
-@export var sender_address: String = ""
 @export var recipient_name: String = ""
 ## Destination address shown on the envelope front.
 @export var address_line: String = ""
