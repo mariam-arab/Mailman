@@ -147,24 +147,24 @@ shadow_enabled = true
 directional_shadow_max_distance = 80.0
 
 [node name="SideCamera" type="Camera3D" parent="." unique_id=979127407]
-transform = Transform3D(0, -0.407, 0.913, 0, 0.913, 0.407, -1, 0, 0, 14, 11, -14)
+transform = Transform3D(0, -0.407, 0.913, 0, 0.913, 0.407, -1, 0, 0, 11, 9, -14)
 current = true
 fov = 35.0
 near = 0.1
 far = 150.0
 
 [node name="Mountain1" type="MeshInstance3D" parent="." unique_id=1745508262]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.607275, 11.356939, 15.068375)
+transform = Transform3D(1.0748825, 0, 0, 0, 3.034693, 0, 0, 0, 1.4378492, -35.284134, 8.931391, 18.649454)
 mesh = SubResource("PrismMesh_mountain")
 surface_material_override/0 = SubResource("Material_mountain")
 
 [node name="Mountain2" type="MeshInstance3D" parent="." unique_id=1427697961]
-transform = Transform3D(0.8, 0, 0, 0, 0.85, 0, 0, 0, 0.7, -25, 5.95, -5)
+transform = Transform3D(0.8, 0, 0, 0, 1.3, 0, 0, 0, 0.7, -27.902124, 8.184447, 4.2670517)
 mesh = SubResource("PrismMesh_mountain")
 surface_material_override/0 = SubResource("Material_mountain")
 
 [node name="Mountain3" type="MeshInstance3D" parent="." unique_id=168398555]
-transform = Transform3D(0.75, 0, 0, 0, 0.8, 0, 0, 0, 0.65, -24, 5.6, 36)
+transform = Transform3D(0.75, 0, 0, 0, 1.2, 0, 0, 0, 0.65, -24.493343, 10.342112, 27.737562)
 mesh = SubResource("PrismMesh_mountain")
 surface_material_override/0 = SubResource("Material_mountain")
 
@@ -186,25 +186,25 @@ transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -23, 9.5, 34)
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, -24, 11.8, -18)
 
 [node name="BgTree1" parent="." unique_id=1457123479 instance=ExtResource("6_tree")]
-transform = Transform3D(0.55, 0, 0, 0, 0.65, 0, 0, 0, 0.55, -14, 0, -11)
+transform = Transform3D(1, 0, 0, 0, 1.15, 0, 0, 0, 1, -14, 0, -11)
 
 [node name="BgTree2" parent="." unique_id=1938783812 instance=ExtResource("6_tree")]
-transform = Transform3D(0.5, 0, 0, 0, 0.6, 0, 0, 0, 0.5, -14, 0, 5)
+transform = Transform3D(1.05, 0, 0, 0, 1.2, 0, 0, 0, 1.05, -14, 0, 5)
 
 [node name="BgTree3" parent="." unique_id=797555921 instance=ExtResource("6_tree")]
-transform = Transform3D(0.58, 0, 0, 0, 0.68, 0, 0, 0, 0.58, -14, 0, 22)
+transform = Transform3D(0.95, 0, 0, 0, 1.1, 0, 0, 0, 0.95, -14, 0, 22)
 
 [node name="BgTree4" parent="." unique_id=541634708 instance=ExtResource("6_tree")]
-transform = Transform3D(0.5, 0, 0, 0, 0.6, 0, 0, 0, 0.5, -14, 0, 38)
+transform = Transform3D(1, 0, 0, 0, 1.15, 0, 0, 0, 1, -14, 0, 38)
 
 [node name="BgBirch1" parent="." unique_id=1404318324 instance=ExtResource("7_birch")]
-transform = Transform3D(0.7, 0, 0, 0, 0.78, 0, 0, 0, 0.7, -12.5, 0, -4)
+transform = Transform3D(1.1, 0, 0, 0, 1.25, 0, 0, 0, 1.1, -12.5, 0, -4)
 
 [node name="BgBirch2" parent="." unique_id=546285130 instance=ExtResource("7_birch")]
-transform = Transform3D(0.76, 0, 0, 0, 0.84, 0, 0, 0, 0.76, -12.5, 0, 14)
+transform = Transform3D(1.1, 0, 0, 0, 1.25, 0, 0, 0, 1.1, -12.5, 0, 14)
 
 [node name="BgBirch3" parent="." unique_id=1246133149 instance=ExtResource("7_birch")]
-transform = Transform3D(0.72, 0, 0, 0, 0.82, 0, 0, 0, 0.72, -12.5, 0, 32)
+transform = Transform3D(1.1, 0, 0, 0, 1.25, 0, 0, 0, 1.1, -12.5, 0, 32)
 
 [node name="Ground" type="StaticBody3D" parent="." unique_id=1719851049]
 
@@ -213,7 +213,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, -0.2, 8)
 shape = SubResource("BoxShape3D_ground")
 
 [node name="GrassMesh" type="MeshInstance3D" parent="Ground" unique_id=343898749]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, -0.2, 8)
+transform = Transform3D(1.9818785, 0, 0, 0, 1.1673965, 0, 0, 0, 1.1673965, -11.522079, -0.19999237, 8.052572)
 mesh = SubResource("BoxMesh_ground")
 surface_material_override/0 = SubResource("Material_grass")
 
@@ -223,7 +223,7 @@ mesh = SubResource("BoxMesh_sidewalk")
 surface_material_override/0 = SubResource("Material_sidewalk")
 
 [node name="HouseA" parent="." unique_id=2095439637 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6.4, 0, -11)
+transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -6.4, 0, -11)
 body_color = Color(0.22, 0.65, 0.88, 1)
 roof_color = Color(0.15, 0.32, 0.62, 1)
 house_label = "311"
@@ -234,7 +234,7 @@ house_id = "house_311"
 house_label = "311"
 
 [node name="HouseB" parent="." unique_id=1786162234 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6, 0, -0.5)
+transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -6, 0, -0.5)
 body_color = Color(0.92, 0.2, 0.18, 1)
 roof_color = Color(0.5, 0.22, 0.15, 1)
 house_label = "312"
@@ -245,7 +245,7 @@ house_id = "house_312"
 house_label = "312"
 
 [node name="HouseC" parent="." unique_id=1504425202 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -5.8, 0, 10.2)
+transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -5.8, 0, 10.2)
 body_color = Color(0.96, 0.84, 0.15, 1)
 roof_color = Color(0.55, 0.38, 0.12, 1)
 house_label = "313"
@@ -256,7 +256,7 @@ house_id = "house_313"
 house_label = "313"
 
 [node name="HouseD" parent="." unique_id=607186217 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6.2, 0, 21)
+transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -6.2, 0, 21)
 body_color = Color(0.22, 0.78, 0.5, 1)
 roof_color = Color(0.15, 0.42, 0.32, 1)
 house_label = "314"
@@ -267,7 +267,7 @@ house_id = "house_314"
 house_label = "314"
 
 [node name="HouseE" parent="." unique_id=738154609 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -5.9, 0, 31)
+transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -5.9, 0, 31)
 body_color = Color(0.92, 0.5, 0.2, 1)
 roof_color = Color(0.48, 0.26, 0.12, 1)
 house_label = "315"
@@ -278,7 +278,7 @@ house_id = "house_315"
 house_label = "315"
 
 [node name="HouseF" parent="." unique_id=1544757676 instance=ExtResource("4_house")]
-transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, -6.3, 0, 41.2)
+transform = Transform3D(0, 0, 1.3, 0, 1.3, 0, -1.3, 0, 0, -6.3, 0, 41.2)
 body_color = Color(0.42, 0.68, 0.32, 1)
 roof_color = Color(0.26, 0.44, 0.18, 1)
 house_label = "316"
@@ -325,28 +325,28 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0, 37.5)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8, 0, 42)
 
 [node name="FgTree1" parent="." unique_id=109218642 instance=ExtResource("6_tree")]
-transform = Transform3D(0.95, 0, 0, 0, 1, 0, 0, 0, 0.95, -2.3, 0, -5.8)
+transform = Transform3D(1.28, 0, 0, 0, 1.35, 0, 0, 0, 1.28, -2.3, 0, -5.8)
 
 [node name="FgTree2" parent="." unique_id=29973417 instance=ExtResource("6_tree")]
-transform = Transform3D(0.92, 0, 0, 0, 0.98, 0, 0, 0, 0.92, -2.1, 0, 4.6)
+transform = Transform3D(1.24, 0, 0, 0, 1.3, 0, 0, 0, 1.24, -2.1, 0, 4.6)
 
 [node name="FgTree3" parent="." unique_id=1331773981 instance=ExtResource("6_tree")]
-transform = Transform3D(1, 0, 0, 0, 1.04, 0, 0, 0, 1, -2.4, 0, 15.6)
+transform = Transform3D(1.32, 0, 0, 0, 1.38, 0, 0, 0, 1.32, -2.4, 0, 15.6)
 
 [node name="FgTree4" parent="." unique_id=1665880352 instance=ExtResource("6_tree")]
-transform = Transform3D(0.96, 0, 0, 0, 1, 0, 0, 0, 0.96, -2.2, 0, 25.5)
+transform = Transform3D(1.28, 0, 0, 0, 1.35, 0, 0, 0, 1.28, -2.2, 0, 25.5)
 
 [node name="FgTree5" parent="." unique_id=229313543 instance=ExtResource("6_tree")]
-transform = Transform3D(1.02, 0, 0, 0, 1.08, 0, 0, 0, 1.02, -2.5, 0, 35.8)
+transform = Transform3D(1.34, 0, 0, 0, 1.42, 0, 0, 0, 1.34, -2.5, 0, 35.8)
 
 [node name="FgBirch1" parent="." unique_id=1988489113 instance=ExtResource("7_birch")]
-transform = Transform3D(0.9, 0, 0, 0, 0.96, 0, 0, 0, 0.9, -1.8, 0, 19.2)
+transform = Transform3D(1.2, 0, 0, 0, 1.3, 0, 0, 0, 1.2, -1.8, 0, 19.2)
 
 [node name="FgBirch2" parent="." unique_id=2100601970 instance=ExtResource("7_birch")]
-transform = Transform3D(0.88, 0, 0, 0, 0.95, 0, 0, 0, 0.88, -1.8, 0, -0.8)
+transform = Transform3D(1.18, 0, 0, 0, 1.28, 0, 0, 0, 1.18, -1.8, 0, -0.8)
 
 [node name="FgBirch3" parent="." unique_id=192203841 instance=ExtResource("7_birch")]
-transform = Transform3D(0.9, 0, 0, 0, 0.98, 0, 0, 0, 0.9, -1.9, 0, 40.3)
+transform = Transform3D(1.2, 0, 0, 0, 1.3, 0, 0, 0, 1.2, -1.9, 0, 40.3)
 
 [node name="Lamp1" type="OmniLight3D" parent="." unique_id=789166641]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 3.5, -4.5)
