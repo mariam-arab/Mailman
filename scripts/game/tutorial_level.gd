@@ -1,7 +1,7 @@
 extends Node3D
 ## Tutorial level — Elmwood Avenue (houses 1401–1406).
 ## Six deliveries introducing the core mechanic: some addresses are complete,
-## some are partially obscured. Supervisor Bauer gives the intro automatically.
+## some are partially obscured. Walk up to Supervisor Bauer and press E to begin.
 
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD
@@ -79,13 +79,6 @@ func _ready() -> void:
 	hud.bind_player(player)
 	GameState.start_day(1, _build_letters())
 	_update_camera_transform(1.0)
-	# Auto-trigger boss introduction on the first frame.
-	call_deferred("_trigger_boss_intro")
-
-
-func _trigger_boss_intro() -> void:
-	if is_instance_valid(boss):
-		boss.interact(player)
 
 
 func _build_letters() -> Array:
