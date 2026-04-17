@@ -157,9 +157,7 @@ func _build_styles() -> void:
 	_sty_nb.shadow_offset = Vector2(2, 4)
 	notebook_node.add_theme_stylebox_override("panel", _sty_nb)
 
-	var sty_tape := StyleBoxFlat.new()
-	sty_tape.bg_color = Color(0.36, 0.38, 0.24, 0.92)
-	tape_bar.add_theme_stylebox_override("panel", sty_tape)
+
 
 
 func _build_vignette() -> void:
@@ -204,7 +202,10 @@ func bind_player(player: Node) -> void:
 
 
 func set_prompt(text: String) -> void:
-	prompt_label.text = text
+	if _showing_inspection and text == "Tab — open bag to deliver":
+		prompt_label.text = "drag envelope into a mail slot to deliver"
+	else:
+		prompt_label.text = text
 
 
 func set_nearby_interactable(target) -> void:
@@ -407,11 +408,8 @@ func _fan_position(index: int, total: int) -> Vector2:
 	return Vector2(x, y)
 
 
-func _fan_tilt(index: int, total: int) -> float:
-	if total <= 1:
-		return 0.0
-	var t := float(index) / float(total - 1)
-	return lerp(-7.0, 7.0, t)
+func _fan_tilt(_index: int, _total: int) -> float:
+	return 0.0
 
 
 func _pulled_position(pull_index: int, total_pulled: int) -> Vector2:
