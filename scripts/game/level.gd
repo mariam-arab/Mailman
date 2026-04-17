@@ -100,7 +100,7 @@ func _build_day_one_letters() -> Array:
 ## but the camera sits above and to the right of the street so the scene reads
 ## like a miniature paper set instead of a flat side elevation.
 @export var camera_follow_smoothing: float = 6.0
-@export var camera_position_offset := Vector3(17.0, 5.0, 0.0)
+@export var camera_position_offset := Vector3(30.0, 10.0, 0.0)
 @export var camera_look_offset := Vector3(-30.5, 1.5, 0.0)
 @onready var side_camera: Camera3D = $SideCamera
 

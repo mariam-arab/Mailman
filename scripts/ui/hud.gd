@@ -117,6 +117,7 @@ var _camera: Camera3D          = null
 var _delivered_letters: Dictionary = {}
 var _slotted_cards:     Dictionary = {}
 
+
 const _NB_PAGES := [
 	"Today's Route\n\n311 - L. Hughes\n312 - Thomas (Tom)\n313 - K. Lyne\n314 - J. Sydney\n315 - M. Hughes\n316 - Linda M.",
 	"How to Deliver\n\nWalk near a mailbox.\nA slot appears above it.\n\nOpen your bag (Tab),\nthen drag an envelope\nonto the slot.",
@@ -394,15 +395,15 @@ func _rebuild_envelopes() -> void:
 
 func _fan_position(index: int, total: int) -> Vector2:
 	var vp   := get_viewport().get_visible_rect().size
-	const EW := 260.0
-	const EH := 165.0
+	const EW := 200.0
+	const EH := 125.0
 	# Step sized so the fan fills ~90 % of viewport width, capped for readability.
 	var max_step := (vp.x * 0.90 - EW) / maxf(total - 1, 1)
-	var step     := clampf(max_step, 70.0, 140.0)
+	var step     := clampf(max_step, 55.0, 110.0)
 	var total_w  := EW + (total - 1) * step
 	var x        := (vp.x - total_w) * 0.5 + index * step
-	# Show ~130 px of card above the tape bar; rest stays below screen edge.
-	var y        := vp.y - 46.0 - 130.0
+	# Show ~70 px of card above the tape bar; rest stays below screen edge.
+	var y        := vp.y - 46.0 - 70.0
 	return Vector2(x, y)
 
 
@@ -415,8 +416,8 @@ func _fan_tilt(index: int, total: int) -> float:
 
 func _pulled_position(pull_index: int, total_pulled: int) -> Vector2:
 	var vp   := get_viewport().get_visible_rect().size
-	const EW := 260.0
-	const GAP := 44.0
+	const EW := 200.0
+	const GAP := 36.0
 	var total_w := total_pulled * EW + (total_pulled - 1) * GAP
 	var x    := (vp.x - total_w) * 0.5 + pull_index * (EW + GAP)
 	var y    := vp.y * 0.20
@@ -464,8 +465,8 @@ func _reposition_pull_cards() -> void:
 # -- envelope construction -----------------------------------------------------
 
 func _make_envelope(letter, index: int, total: int) -> Panel:
-	const EW := 260.0
-	const EH := 165.0
+	const EW := 200.0
+	const EH := 125.0
 
 	var theme_id := _letter_theme(letter)
 	var td: Dictionary = THEME_DATA[theme_id]
@@ -749,6 +750,7 @@ func _update_delivery_slots() -> void:
 		_update_pager_hint()
 
 
+
 func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
 	const SW := 124.0
 	const SH :=  66.0
@@ -806,6 +808,43 @@ func _update_slot_highlight(mouse_pos: Vector2) -> void:
 			sp.get_meta("sty_hot") if _hit(sp, mouse_pos) else sp.get_meta("sty_idle"))
 
 
+# -- house zone projection -----------------------------------------------------
+
+## Returns a screen-space Rect2 that covers the house belonging to `mailbox`.
+## We project 8 world-space corners of the house bounding box so the zone
+## automatically shrinks for far houses and grows for near ones (perspective).
+func _house_zone(mailbox: Node) -> Rect2:
+	if _camera == null:
+		return Rect2()
+	# House bbox in world-space relative to the mailbox origin.
+	# Houses sit ~6 units behind (in -X) the mailbox, are ~7.5 units tall,
+	# and ~3.5 units wide (in Z).  Scale 1.3 is already baked into world coords.
+	const X_NEAR :=  0.5    # just past mailbox towards camera
+	const X_FAR  := -9.0    # back wall of house
+	const Y_TOP  :=  6.5    # chimney top
+	const Z_HALF :=  2.0    # half street-width (house body is ±2.86 but trim to body face)
+	var mb: Vector3 = (mailbox as Node3D).global_position
+	var corners := [
+		mb + Vector3(X_NEAR, 0.0,   -Z_HALF),
+		mb + Vector3(X_NEAR, 0.0,    Z_HALF),
+		mb + Vector3(X_FAR,  0.0,   -Z_HALF),
+		mb + Vector3(X_FAR,  0.0,    Z_HALF),
+		mb + Vector3(X_NEAR, Y_TOP, -Z_HALF),
+		mb + Vector3(X_NEAR, Y_TOP,  Z_HALF),
+		mb + Vector3(X_FAR,  Y_TOP, -Z_HALF),
+		mb + Vector3(X_FAR,  Y_TOP,  Z_HALF),
+	]
+	var min_x := INF;  var min_y := INF
+	var max_x := -INF; var max_y := -INF
+	for c in corners:
+		var p := _camera.unproject_position(c)
+		min_x = minf(min_x, p.x)
+		min_y = minf(min_y, p.y)
+		max_x = maxf(max_x, p.x)
+		max_y = maxf(max_y, p.y)
+	return Rect2(min_x, min_y, max_x - min_x, max_y - min_y)
+
+
 # -- animations ----------------------------------------------------------------
 
 func _slide_envelopes_in() -> void:
@@ -841,16 +880,13 @@ func _end_drag(pos: Vector2) -> void:
 	var was_in_slot: bool = _drag_card.get_meta("was_in_slot", false)
 
 	for mb in _slot_panels:
-		var sp: Panel = _slot_panels[mb]
-		var center := sp.global_position + sp.size * 0.5
-		# Large delivery zone covering the whole house facade above the slot.
-		var zone := Rect2(center.x - 130.0, center.y - 300.0, 260.0, 360.0)
+		var zone := _house_zone(mb)
 		if zone.has_point(pos):
 			_deliver_dragged(mb)
 			return
 
 	var vph := get_viewport().get_visible_rect().size.y
-	if pos.y > vph * 0.85:
+	if pos.y > vph - 46.0:
 		if was_in_slot:
 			GameState.un_deliver(_drag_card.get_meta("letter"))
 			_delivered_letters.erase(_drag_card.get_meta("letter"))
