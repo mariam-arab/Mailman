@@ -132,6 +132,7 @@ var _sty_nb: StyleBoxFlat
 func _ready() -> void:
 	add_to_group("hud")
 	_build_styles()
+	_build_vignette()
 	_build_notebook()
 	inspection.visible     = false
 	summary.visible        = false
@@ -158,6 +159,34 @@ func _build_styles() -> void:
 	var sty_tape := StyleBoxFlat.new()
 	sty_tape.bg_color = Color(0.36, 0.38, 0.24, 0.92)
 	tape_bar.add_theme_stylebox_override("panel", sty_tape)
+
+
+func _build_vignette() -> void:
+	# Dark-to-transparent gradient covering bottom 40% of screen,
+	# giving envelopes a dark backdrop to pop against.
+	var grad := Gradient.new()
+	grad.set_color(0, Color(0, 0, 0, 0))
+	grad.set_color(1, Color(0, 0, 0, 0.42))
+
+	var tex := GradientTexture2D.new()
+	tex.gradient  = grad
+	tex.fill      = GradientTexture2D.FILL_LINEAR
+	tex.fill_from = Vector2(0.5, 0.0)
+	tex.fill_to   = Vector2(0.5, 1.0)
+
+	var tr := TextureRect.new()
+	tr.texture      = tex
+	tr.anchor_left   = 0.0
+	tr.anchor_top    = 0.60   # covers bottom 40 % of screen
+	tr.anchor_right  = 1.0
+	tr.anchor_bottom = 1.0
+	tr.offset_left   = 0; tr.offset_top    = 0
+	tr.offset_right  = 0; tr.offset_bottom = 0
+	tr.expand_mode   = TextureRect.EXPAND_IGNORE_SIZE
+	tr.stretch_mode  = TextureRect.STRETCH_SCALE
+	tr.mouse_filter  = Control.MOUSE_FILTER_IGNORE
+	inspection.add_child(tr)
+	inspection.move_child(tr, 2)   # after DimRect(0), StreetName(1); before EnvelopesLayer
 
 
 func _build_notebook() -> void:
@@ -366,10 +395,14 @@ func _rebuild_envelopes() -> void:
 func _fan_position(index: int, total: int) -> Vector2:
 	var vp   := get_viewport().get_visible_rect().size
 	const EW := 260.0
-	var step := clampf(vp.x * 0.55 / maxf(total - 1, 1), 70.0, 120.0)
-	var total_w := EW + (total - 1) * step
-	var x    := (vp.x - total_w) * 0.5 + index * step
-	var y    := vp.y - 74.0
+	const EH := 165.0
+	# Step sized so the fan fills ~90 % of viewport width, capped for readability.
+	var max_step := (vp.x * 0.90 - EW) / maxf(total - 1, 1)
+	var step     := clampf(max_step, 70.0, 140.0)
+	var total_w  := EW + (total - 1) * step
+	var x        := (vp.x - total_w) * 0.5 + index * step
+	# Show ~130 px of card above the tape bar; rest stays below screen edge.
+	var y        := vp.y - 46.0 - 130.0
 	return Vector2(x, y)
 
 
@@ -377,7 +410,7 @@ func _fan_tilt(index: int, total: int) -> float:
 	if total <= 1:
 		return 0.0
 	var t := float(index) / float(total - 1)
-	return lerp(-13.0, 13.0, t)
+	return lerp(-7.0, 7.0, t)
 
 
 func _pulled_position(pull_index: int, total_pulled: int) -> Vector2:
@@ -564,7 +597,6 @@ func _add_airmail_stripes(card: Panel, _ew: float, eh: float) -> void:
 		cr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		card.add_child(cr)
 	var par := Label.new()
-	par.text         = "PAR AVION"
 	par.position     = Vector2(3.0 * SW + 5.0, 9.0)
 	par.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	par.add_theme_font_size_override("font_size", 9)
@@ -670,7 +702,7 @@ func _update_delivery_slots() -> void:
 	var prev_count := _slot_panels.size()
 
 	for node in get_tree().get_nodes_in_group("interactable"):
-		if not (node is InteractableObject) or not node.enabled:
+		if not (node is Mailbox) or not node.enabled:
 			continue
 		var world_pos:  Vector3 = node.global_position + Vector3(0, 2.0, 0)
 		var screen_pos: Vector2 = _camera.unproject_position(world_pos)
