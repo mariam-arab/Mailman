@@ -6,12 +6,11 @@ class_name Mail
 @export var id: String = ""
 @export var sender_name: String = ""
 @export var sender_address: String = ""
-## Vague hint at who lives at the destination — visible on the envelope.
-@export_multiline var recipient_description: String = ""
-## Handwritten note on the back of the envelope. Often the strongest clue.
-@export_multiline var clue_text: String = ""
-## Visible smudged street label, e.g. "?? Maple Street". Address number missing.
+@export var recipient_name: String = ""
+## Destination address shown on the envelope front.
 @export var address_line: String = ""
+## Body of the letter — shown only when the envelope is opened.
+@export_multiline var message: String = ""
 @export var has_wax_seal: bool = false
 ## Which house this letter belongs to. Must match Mailbox.house_id.
 @export var correct_house_id: String = ""
