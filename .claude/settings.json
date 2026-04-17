@@ -1,7 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pkill -f \"Godot.*neighborhood_01\")"
+      "Bash(pkill -f \"Godot.*tutorial_01\")"
     ]
   }
 }
