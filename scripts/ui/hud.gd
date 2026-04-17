@@ -286,33 +286,53 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 	card.position         = rest
 	card.rotation_degrees = _envelope_tilt(letter.id)
 
-	# Front
+	# Front — sender block (top-left) + recipient block (centre-bottom)
 	var front := Control.new()
 	front.name = "Front"
 	front.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	front.mouse_filter = Control.MOUSE_FILTER_PASS
-	var fv := VBoxContainer.new()
-	fv.name = "VBox"
-	fv.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	fv.offset_left = 16; fv.offset_top = 14; fv.offset_right = -16; fv.offset_bottom = -14
-	fv.add_theme_constant_override("separation", 6)
-	var s := Label.new(); s.name = "Sender"
-	s.autowrap_mode = TextServer.AUTOWRAP_WORD
-	s.add_theme_font_size_override("font_size", 9)
-	s.add_theme_color_override("font_color", Color(0.40, 0.28, 0.18, 1))
-	var a := Label.new(); a.name = "Address"
-	a.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	a.autowrap_mode = TextServer.AUTOWRAP_WORD
-	a.add_theme_font_size_override("font_size", 14)
-	a.add_theme_color_override("font_color", Color(0.18, 0.12, 0.08, 1))
-	var r := Label.new(); r.name = "Recipient"
-	r.autowrap_mode = TextServer.AUTOWRAP_WORD
-	r.add_theme_font_size_override("font_size", 10)
-	r.add_theme_color_override("font_color", Color(0.35, 0.22, 0.15, 1))
-	fv.add_child(s); fv.add_child(a); fv.add_child(r)
-	front.add_child(fv)
 
-	# Back
+	# Sender block (top-left)
+	var from_box := VBoxContainer.new()
+	from_box.name = "FromBox"
+	from_box.set_anchor(SIDE_LEFT,   0.0); from_box.set_anchor(SIDE_TOP,    0.0)
+	from_box.set_anchor(SIDE_RIGHT,  0.6); from_box.set_anchor(SIDE_BOTTOM, 0.5)
+	from_box.offset_left = 10; from_box.offset_top = 10
+	from_box.offset_right = -4; from_box.offset_bottom = 0
+	from_box.add_theme_constant_override("separation", 1)
+	var sn := Label.new(); sn.name = "SenderName"
+	sn.autowrap_mode = TextServer.AUTOWRAP_WORD
+	sn.add_theme_font_size_override("font_size", 9)
+	sn.add_theme_color_override("font_color", Color(0.35, 0.24, 0.14, 1))
+	var sa := Label.new(); sa.name = "SenderAddr"
+	sa.autowrap_mode = TextServer.AUTOWRAP_WORD
+	sa.add_theme_font_size_override("font_size", 8)
+	sa.add_theme_color_override("font_color", Color(0.48, 0.34, 0.22, 1))
+	from_box.add_child(sn); from_box.add_child(sa)
+	front.add_child(from_box)
+
+	# Recipient block (centre, lower half)
+	var to_box := VBoxContainer.new()
+	to_box.name = "ToBox"
+	to_box.set_anchor(SIDE_LEFT,   0.0); to_box.set_anchor(SIDE_TOP,    0.42)
+	to_box.set_anchor(SIDE_RIGHT,  1.0); to_box.set_anchor(SIDE_BOTTOM, 1.0)
+	to_box.offset_left = 12; to_box.offset_top = 0
+	to_box.offset_right = -12; to_box.offset_bottom = -10
+	to_box.add_theme_constant_override("separation", 2)
+	var rn := Label.new(); rn.name = "RecipientName"
+	rn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rn.autowrap_mode = TextServer.AUTOWRAP_WORD
+	rn.add_theme_font_size_override("font_size", 13)
+	rn.add_theme_color_override("font_color", Color(0.12, 0.08, 0.04, 1))
+	var ra := Label.new(); ra.name = "RecipientAddr"
+	ra.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ra.autowrap_mode = TextServer.AUTOWRAP_WORD
+	ra.add_theme_font_size_override("font_size", 11)
+	ra.add_theme_color_override("font_color", Color(0.25, 0.16, 0.10, 1))
+	to_box.add_child(rn); to_box.add_child(ra)
+	front.add_child(to_box)
+
+	# Back — message (shown when envelope is opened)
 	var back := Control.new()
 	back.name = "Back"; back.visible = false
 	back.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -323,15 +343,15 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 	bv.offset_left = 18; bv.offset_top = 16; bv.offset_right = -18; bv.offset_bottom = -16
 	bv.add_theme_constant_override("separation", 8)
 	var ch := Label.new()
-	ch.text = "— scrawled on the back —"
+	ch.text = "— message —"
 	ch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	ch.add_theme_font_size_override("font_size", 10)
 	ch.add_theme_color_override("font_color", Color(0.42, 0.30, 0.20, 1))
-	var cl := Label.new(); cl.name = "Clue"
-	cl.autowrap_mode = TextServer.AUTOWRAP_WORD
-	cl.add_theme_font_size_override("font_size", 11)
-	cl.add_theme_color_override("font_color", Color(0.18, 0.12, 0.08, 1))
-	bv.add_child(ch); bv.add_child(cl)
+	var ml := Label.new(); ml.name = "Message"
+	ml.autowrap_mode = TextServer.AUTOWRAP_WORD
+	ml.add_theme_font_size_override("font_size", 11)
+	ml.add_theme_color_override("font_color", Color(0.18, 0.12, 0.08, 1))
+	bv.add_child(ch); bv.add_child(ml)
 	back.add_child(bv)
 
 	card.add_child(front)
@@ -347,12 +367,13 @@ func _apply_face(card: Panel, letter, showing_back: bool) -> void:
 	back.visible  = showing_back
 	if showing_back:
 		card.add_theme_stylebox_override("panel", _sty_env_bk)
-		back.get_node("VBox/Clue").text = letter.clue_text
+		back.get_node("VBox/Message").text = letter.message
 	else:
 		card.add_theme_stylebox_override("panel", _sty_env)
-		front.get_node("VBox/Sender").text    = "%s\n%s" % [letter.sender_name, letter.sender_address]
-		front.get_node("VBox/Address").text   = letter.address_line
-		front.get_node("VBox/Recipient").text = letter.recipient_description
+		front.get_node("FromBox/SenderName").text = letter.sender_name
+		front.get_node("FromBox/SenderAddr").text = letter.sender_address
+		front.get_node("ToBox/RecipientName").text = letter.recipient_name
+		front.get_node("ToBox/RecipientAddr").text = letter.address_line
 
 
 # ── delivery slots (live, updated every frame while overlay is open) ──────────
