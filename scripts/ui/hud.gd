@@ -11,10 +11,11 @@ extends CanvasLayer
 @onready var pager_hint:       Label         = $Inspection/TapeBar/PagerHint
 @onready var summary:          Control       = $Summary
 @onready var summary_label:    Label         = $Summary/Center/SummaryLabel
-@onready var dialogue_panel:   Panel         = $DialoguePanel
-@onready var dialogue_speaker: Label         = $DialoguePanel/Speaker
-@onready var dialogue_text:    Label         = $DialoguePanel/Text
-@onready var dialogue_hint:    Label         = $DialoguePanel/Hint
+@onready var dialogue_panel:     Panel   = $DialoguePanel
+@onready var dialogue_portrait:  Control = $DialoguePanel/Portrait
+@onready var dialogue_speaker:   Label   = $DialoguePanel/Speaker
+@onready var dialogue_text:      Label   = $DialoguePanel/Text
+@onready var dialogue_hint:      Label   = $DialoguePanel/Hint
 
 # -- envelope themes -----------------------------------------------------------
 
@@ -192,12 +193,64 @@ func open_inspection() -> void:
 	_rebuild_envelopes()
 
 
-func open_dialogue(lines: Array, speaker_name: String = "") -> void:
+func open_dialogue(lines: Array, speaker_name: String = "", portrait: Dictionary = {}) -> void:
 	_dialogue_lines = lines
 	_dialogue_idx   = 0
 	dialogue_speaker.text = speaker_name
+	_build_portrait(portrait)
 	dialogue_panel.visible = true
 	_show_dialogue_line()
+
+
+func _build_portrait(p: Dictionary) -> void:
+	for c in dialogue_portrait.get_children():
+		c.queue_free()
+	if p.is_empty():
+		return
+
+	var skin: Color = p.get("skin", Color(0.88, 0.70, 0.54, 1))
+	var body: Color = p.get("body", Color(0.52, 0.62, 0.44, 1))
+	var cap:  Color = p.get("cap",  Color(0, 0, 0, 0))
+
+	var W := dialogue_portrait.size.x  # 72 px
+	var H := dialogue_portrait.size.y  # 112 px
+
+	# Body block
+	var bw := W * 0.72; var bh := H * 0.26
+	var body_rect := ColorRect.new()
+	body_rect.color    = body
+	body_rect.size     = Vector2(bw, bh)
+	body_rect.position = Vector2((W - bw) * 0.5, H - bh)
+	body_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dialogue_portrait.add_child(body_rect)
+
+	# Head block
+	var hw := W * 0.56; var hh := H * 0.34
+	var head_rect := ColorRect.new()
+	head_rect.color    = skin
+	head_rect.size     = Vector2(hw, hh)
+	head_rect.position = Vector2((W - hw) * 0.5, H - bh - hh - 2.0)
+	head_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	dialogue_portrait.add_child(head_rect)
+
+	# Cap (only if alpha > 0)
+	if cap.a > 0.01:
+		var head_top := head_rect.position.y
+		var cw := W * 0.64; var ch := H * 0.14
+		var cap_crown := ColorRect.new()
+		cap_crown.color    = cap
+		cap_crown.size     = Vector2(cw, ch)
+		cap_crown.position = Vector2((W - cw) * 0.5, head_top - ch)
+		cap_crown.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		dialogue_portrait.add_child(cap_crown)
+
+		var brimw := W * 0.76; var brimh := H * 0.06
+		var cap_brim := ColorRect.new()
+		cap_brim.color    = cap
+		cap_brim.size     = Vector2(brimw, brimh)
+		cap_brim.position = Vector2((W - brimw) * 0.5, head_top - brimh - 1.0)
+		cap_brim.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		dialogue_portrait.add_child(cap_brim)
 
 
 func _show_dialogue_line() -> void:
