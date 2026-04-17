@@ -851,13 +851,21 @@ func _end_drag(pos: Vector2) -> void:
 		if was_in_slot:
 			GameState.un_deliver(_drag_card.get_meta("letter"))
 			_delivered_letters.erase(_drag_card.get_meta("letter"))
-		# Card sticks wherever it was dropped — just reset scale and straighten.
+		# Card snaps back into the visible area, resets scale and straightens.
 		var card: Panel = _drag_card
+		var vp_size := get_viewport().get_visible_rect().size
+		var margin  := 24.0
+		var safe := Vector2(
+			clampf(card.position.x, margin, vp_size.x - card.size.x - margin),
+			clampf(card.position.y, margin, vp_size.y - card.size.y * 0.5)
+		)
 		var tw := create_tween()
 		tw.set_parallel(true)
 		tw.tween_property(card, "scale", Vector2.ONE, 0.12) \
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tw.tween_property(card, "rotation_degrees", 0.0, 0.16)
+		tw.tween_property(card, "position", safe, 0.20) \
+			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	_drag_card = null
 
 
