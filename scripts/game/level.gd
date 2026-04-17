@@ -19,7 +19,7 @@ const DAY_ONE_LETTERS := [
 		"recipient_description":
 			"Thomas Heart",
 		"clue_text":
-			"Dear Thomas — your annual subscription renewal is enclosed. Tight lines! — The Editors",
+			"",
 		"correct_house_id": "house_312",
 		"difficulty": 2,
 	},
@@ -41,7 +41,7 @@ const DAY_ONE_LETTERS := [
 		"sender_address": "22 Birchwood Drive, Ottawa",
 		"address_line": "?? Maple Street",
 		"recipient_description":
-			"J. Syndnet",
+			"J. Sydney",
 		"clue_text":
 			"",
 		"correct_house_id": "house_314",
