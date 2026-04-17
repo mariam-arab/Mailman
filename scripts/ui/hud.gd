@@ -16,9 +16,17 @@ extends CanvasLayer
 @onready var pager_hint: Label          = $Inspection/PagerHint
 @onready var summary: Control           = $Summary
 @onready var summary_label: Label       = $Summary/Center/SummaryLabel
+@onready var dialogue_panel: Panel      = $DialoguePanel
+@onready var dialogue_speaker: Label    = $DialoguePanel/Speaker
+@onready var dialogue_text: Label       = $DialoguePanel/Text
+@onready var dialogue_hint: Label       = $DialoguePanel/Hint
 
 var _player: Node               = null
 var _showing_inspection: bool   = false
+
+# Dialogue
+var _dialogue_lines: Array      = []
+var _dialogue_idx: int          = 0
 var _nearby_interactable        = null
 var _cards: Array               = []
 
@@ -50,11 +58,13 @@ var _sty_nb:      StyleBoxFlat
 # ── init ──────────────────────────────────────────────────────────────────────
 
 func _ready() -> void:
+	add_to_group("hud")
 	_build_styles()
 	_build_notebook()
-	inspection.visible = false
-	summary.visible    = false
-	prompt_label.text  = ""
+	inspection.visible     = false
+	summary.visible        = false
+	dialogue_panel.visible = false
+	prompt_label.text      = ""
 	GameState.day_started.connect(_on_day_started)
 	GameState.day_ended.connect(_on_day_ended)
 	GameState.letter_delivered.connect(_on_letter_delivered)
@@ -120,9 +130,43 @@ func open_inspection() -> void:
 	_rebuild_envelopes()
 
 
+func open_dialogue(lines: Array, speaker_name: String = "") -> void:
+	_dialogue_lines = lines
+	_dialogue_idx   = 0
+	dialogue_speaker.text = speaker_name
+	dialogue_panel.visible = true
+	_show_dialogue_line()
+
+
+func _show_dialogue_line() -> void:
+	dialogue_text.text = _dialogue_lines[_dialogue_idx]
+	var last: bool = _dialogue_idx >= _dialogue_lines.size() - 1
+	dialogue_hint.text = "E — close" if last else "E — continue"
+
+
+func _close_dialogue() -> void:
+	_dialogue_lines = []
+	var tw := create_tween()
+	tw.tween_property(dialogue_panel, "modulate:a", 0.0, 0.18)
+	tw.tween_callback(func():
+		dialogue_panel.visible = false
+		dialogue_panel.modulate.a = 1.0
+	)
+
+
 # ── input ─────────────────────────────────────────────────────────────────────
 
 func _input(event: InputEvent) -> void:
+	# Dialogue takes priority — consume E so level.gd doesn't also fire.
+	if _dialogue_lines.size() > 0 and event.is_action_pressed("interact"):
+		_dialogue_idx += 1
+		if _dialogue_idx >= _dialogue_lines.size():
+			_close_dialogue()
+		else:
+			_show_dialogue_line()
+		get_viewport().set_input_as_handled()
+		return
+
 	if event.is_action_pressed("inspect_mail"):
 		_toggle_inspection()
 		return
