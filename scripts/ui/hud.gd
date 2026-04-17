@@ -201,8 +201,8 @@ func _envelope_tilt(id: String) -> float:
 
 
 func _make_envelope(letter, index: int, total: int) -> Panel:
-	const EW := 268.0
-	const EH := 172.0
+	const EW := 200.0
+	const EH := 128.0
 	var card := Panel.new()
 	card.custom_minimum_size = Vector2(EW, EH)
 	card.size                = Vector2(EW, EH)
@@ -227,16 +227,16 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 	fv.add_theme_constant_override("separation", 6)
 	var s := Label.new(); s.name = "Sender"
 	s.autowrap_mode = TextServer.AUTOWRAP_WORD
-	s.add_theme_font_size_override("font_size", 11)
+	s.add_theme_font_size_override("font_size", 9)
 	s.add_theme_color_override("font_color", Color(0.40, 0.28, 0.18, 1))
 	var a := Label.new(); a.name = "Address"
 	a.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	a.autowrap_mode = TextServer.AUTOWRAP_WORD
-	a.add_theme_font_size_override("font_size", 19)
+	a.add_theme_font_size_override("font_size", 14)
 	a.add_theme_color_override("font_color", Color(0.18, 0.12, 0.08, 1))
 	var r := Label.new(); r.name = "Recipient"
 	r.autowrap_mode = TextServer.AUTOWRAP_WORD
-	r.add_theme_font_size_override("font_size", 13)
+	r.add_theme_font_size_override("font_size", 10)
 	r.add_theme_color_override("font_color", Color(0.35, 0.22, 0.15, 1))
 	fv.add_child(s); fv.add_child(a); fv.add_child(r)
 	front.add_child(fv)
@@ -254,11 +254,11 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 	var ch := Label.new()
 	ch.text = "— scrawled on the back —"
 	ch.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ch.add_theme_font_size_override("font_size", 12)
+	ch.add_theme_font_size_override("font_size", 10)
 	ch.add_theme_color_override("font_color", Color(0.42, 0.30, 0.20, 1))
 	var cl := Label.new(); cl.name = "Clue"
 	cl.autowrap_mode = TextServer.AUTOWRAP_WORD
-	cl.add_theme_font_size_override("font_size", 14)
+	cl.add_theme_font_size_override("font_size", 11)
 	cl.add_theme_color_override("font_color", Color(0.18, 0.12, 0.08, 1))
 	bv.add_child(ch); bv.add_child(cl)
 	back.add_child(bv)
@@ -315,6 +315,7 @@ func _update_delivery_slots() -> void:
 				var sp := _make_slot_panel(house_lbl, screen_pos)
 				sp.modulate.a = 0.0
 				envelopes_layer.add_child(sp)
+				envelopes_layer.move_child(sp, 0)
 				_slot_panels[node] = sp
 				var tw := create_tween()
 				tw.tween_property(sp, "modulate:a", 1.0, 0.25)
