@@ -172,8 +172,16 @@ offset_top = -148.0
 offset_bottom = -20.0
 theme_override_styles/panel = SubResource("StyleBox_dialogue")
 
+; Portrait — populated at runtime by hud.gd using ColorRects.
+[node name="Portrait" type="Control" parent="DialoguePanel"]
+offset_left = 10.0
+offset_top = 8.0
+offset_right = 82.0
+offset_bottom = 120.0
+mouse_filter = 2
+
 [node name="Speaker" type="Label" parent="DialoguePanel"]
-offset_left = 16.0
+offset_left = 90.0
 offset_top = 10.0
 offset_right = 400.0
 offset_bottom = 32.0
@@ -184,7 +192,7 @@ theme_override_colors/font_color = Color(0.52, 0.30, 0.14, 1)
 [node name="Text" type="Label" parent="DialoguePanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
+offset_left = 90.0
 offset_top = 32.0
 offset_right = -16.0
 offset_bottom = -30.0
