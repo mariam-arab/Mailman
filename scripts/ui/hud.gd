@@ -4,8 +4,6 @@ extends CanvasLayer
 ## Click an envelope to pull it up into the workspace (max 2 at once).
 ## Drag any envelope onto a mailbox slot to deliver. Right-click to flip.
 
-@onready var stamp_row:        HBoxContainer = $StampRow
-@onready var stamp_counter:    Label         = $StampCounter
 @onready var prompt_label:     Label         = $PromptLabel
 @onready var inspection:       Control       = $Inspection
 @onready var envelopes_layer:  Control       = $Inspection/EnvelopesLayer
@@ -98,7 +96,6 @@ var _dialogue_lines: Array     = []
 var _dialogue_idx: int         = 0
 var _nearby_interactable       = null
 var _cards: Array              = []
-var _delivered_count: int      = 0
 
 const MAX_PULLED                := 2
 const DRAG_THRESHOLD            := 8.0
@@ -140,7 +137,6 @@ func _ready() -> void:
 	summary.visible        = false
 	dialogue_panel.visible = false
 	prompt_label.text      = ""
-	stamp_counter.text     = ""
 	GameState.day_started.connect(_on_day_started)
 	GameState.day_ended.connect(_on_day_ended)
 	GameState.letter_delivered.connect(_on_letter_delivered)
@@ -777,25 +773,14 @@ func _make_slot_panel(house_lbl: String, screen_pos: Vector2) -> Panel:
 	p.set_meta("sty_idle", sty_idle)
 	p.set_meta("sty_hot",  sty_hot)
 
-	var icon := Label.new()
-	icon.text                 = "E"
-	icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	icon.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	icon.offset_top    = 8
-	icon.offset_bottom = 40
-	icon.add_theme_font_size_override("font_size", 20)
-	icon.add_theme_color_override("font_color", Color(0.88, 0.82, 0.65, 1))
-
 	var lbl := Label.new()
 	lbl.text                 = house_lbl
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	lbl.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	lbl.offset_top    = -24
-	lbl.offset_bottom = -5
-	lbl.add_theme_font_size_override("font_size", 11)
+	lbl.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
+	lbl.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	lbl.add_theme_font_size_override("font_size", 13)
 	lbl.add_theme_color_override("font_color", Color(0.88, 0.84, 0.70, 1))
 
-	p.add_child(icon)
 	p.add_child(lbl)
 	return p
 
@@ -1007,26 +992,12 @@ func _on_selected_changed(_index: int, _letter) -> void:
 	pass
 
 
-func _on_day_started(_day: int, letters: Array) -> void:
-	for child in stamp_row.get_children():
-		child.queue_free()
-	_delivered_count = 0
-	for letter in letters:
-		stamp_row.add_child(_make_stamp_slot(letter))
-	_update_stamp_counter(letters.size())
+func _on_day_started(_day: int, _letters: Array) -> void:
+	pass
 
 
-func _on_letter_delivered(_letter, _house_id: String, was_correct: bool) -> void:
-	_delivered_count += 1
-	for slot in stamp_row.get_children():
-		if slot.get_meta("delivered", false) == false:
-			slot.set_meta("delivered", true)
-			var mark: Label = slot.get_meta("mark_label")
-			mark.text = "v" if was_correct else "x"
-			mark.add_theme_color_override("font_color",
-				Color(1, 1, 1, 0.95) if was_correct else Color(1, 0.9, 0.4, 0.9))
-			break
-	_update_stamp_counter(stamp_row.get_child_count())
+func _on_letter_delivered(_letter, _house_id: String, _was_correct: bool) -> void:
+	pass
 
 
 func _on_day_ended(day: int, results: Array) -> void:
@@ -1044,54 +1015,3 @@ func _on_day_ended(day: int, results: Array) -> void:
 		_player.set_input_active(false)
 
 
-# -- stamp slot ----------------------------------------------------------------
-
-func _make_stamp_slot(letter = null) -> Control:
-	var theme_id := _letter_theme(letter) if letter != null else 0
-	var td: Dictionary = THEME_DATA[theme_id]
-
-	const OW := 40.0
-	const OH := 50.0
-
-	var outer := Control.new()
-	outer.custom_minimum_size = Vector2(OW, OH)
-
-	var p_outer := Panel.new()
-	p_outer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	p_outer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sty_o := StyleBoxFlat.new()
-	sty_o.bg_color     = Color(0.97, 0.93, 0.85, 1)
-	sty_o.border_color = Color(0.80, 0.74, 0.60, 1)
-	sty_o.set_border_width_all(3)
-	sty_o.set_corner_radius_all(3)
-	p_outer.add_theme_stylebox_override("panel", sty_o)
-
-	var p_inner := Panel.new()
-	p_inner.position     = Vector2(4, 4)
-	p_inner.size         = Vector2(OW - 8.0, OH - 8.0)
-	p_inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sty_i := StyleBoxFlat.new()
-	sty_i.bg_color = td["tracker"]
-	sty_i.set_corner_radius_all(2)
-	p_inner.add_theme_stylebox_override("panel", sty_i)
-
-	var mark := Label.new()
-	mark.name                 = "Mark"
-	mark.text                 = ""
-	mark.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	mark.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
-	mark.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	mark.mouse_filter         = Control.MOUSE_FILTER_IGNORE
-	mark.add_theme_font_size_override("font_size", 20)
-	mark.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
-
-	p_inner.add_child(mark)
-	outer.add_child(p_outer)
-	outer.add_child(p_inner)
-	outer.set_meta("delivered",  false)
-	outer.set_meta("mark_label", mark)
-	return outer
-
-
-func _update_stamp_counter(total: int) -> void:
-	stamp_counter.text = "%d / %d livre" % [_delivered_count, total]
