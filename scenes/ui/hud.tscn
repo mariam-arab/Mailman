@@ -50,30 +50,74 @@ theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 
+; --- Mail overlay — no dim, world stays visible -------------------------------
 [node name="Inspection" type="Control" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 1
 
-[node name="Dim" type="Panel" parent="Inspection"]
+; Envelopes are added here dynamically by hud.gd.
+[node name="EnvelopesLayer" type="Control" parent="Inspection"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_styles/panel = SubResource("StyleBox_dim")
+mouse_filter = 1
 
-; Cards are added dynamically by hud.gd. alignment=1 centres them horizontally.
-; offset_bottom reserves space for the PagerHint label below.
-[node name="CarouselRow" type="HBoxContainer" parent="Inspection"]
-anchors_preset = 15
-anchor_right = 1.0
+; Notebook — bottom-left corner, always visible while overlay is open.
+[node name="Notebook" type="Panel" parent="Inspection"]
+anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 40.0
-offset_right = -40.0
-offset_bottom = -60.0
-alignment = 1
-theme_override_constants/separation = 24
+offset_left = 20.0
+offset_top = -264.0
+offset_right = 204.0
+offset_bottom = -20.0
 
+[node name="Title" type="Label" parent="Inspection/Notebook"]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 184.0
+offset_bottom = 36.0
+text = "Notes"
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.40, 0.28, 0.18, 1)
+
+[node name="Content" type="Label" parent="Inspection/Notebook"]
+offset_left = 12.0
+offset_top = 40.0
+offset_right = 184.0
+offset_bottom = -40.0
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.28, 0.20, 0.14, 1)
+
+[node name="PagePrev" type="Label" parent="Inspection/Notebook"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -34.0
+offset_right = 50.0
+offset_bottom = -8.0
+text = ""
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.55, 0.38, 0.22, 1)
+
+[node name="PageNext" type="Label" parent="Inspection/Notebook"]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -50.0
+offset_top = -34.0
+offset_right = -10.0
+offset_bottom = -8.0
+text = "▶"
+horizontal_alignment = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.55, 0.38, 0.22, 1)
+
+; Navigation / delivery hint — bottom centre.
 [node name="PagerHint" type="Label" parent="Inspection"]
 anchor_top = 1.0
 anchor_right = 1.0
@@ -83,11 +127,12 @@ offset_bottom = -12.0
 text = ""
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.85, 0.80, 0.72, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_colors/font_color = Color(0.97, 0.93, 0.85, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.75)
 theme_override_constants/shadow_offset_x = 1
 theme_override_constants/shadow_offset_y = 1
 
+; --- End-of-day summary card --------------------------------------------------
 [node name="Summary" type="Control" parent="."]
 visible = false
 anchors_preset = 15
