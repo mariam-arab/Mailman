@@ -14,7 +14,6 @@ const DAY_ONE_LETTERS := [
 	{
 		"id": "letter_01",
 		"sender_name": "Fisherman's Digest",
-		"sender_address": "14 Harbour Lane, Halifax",
 		"recipient_name": "Thomas Heart",
 		"address_line": "?? Maple Street",
 		"message": "",
@@ -24,7 +23,6 @@ const DAY_ONE_LETTERS := [
 	{
 		"id": "letter_02",
 		"sender_name": "Gardener's Digest",
-		"sender_address": "8 Greenhouse Row, Burlington",
 		"recipient_name": "Linda Michaels",
 		"address_line": "?? Maple Street",
 		"message": "",
@@ -34,7 +32,6 @@ const DAY_ONE_LETTERS := [
 	{
 		"id": "letter_03",
 		"sender_name": "L. Sydney",
-		"sender_address": "22 Birchwood Drive, Ottawa",
 		"recipient_name": "J. Sydney",
 		"address_line": "?? Maple Street",
 		"message": "",
@@ -44,7 +41,6 @@ const DAY_ONE_LETTERS := [
 	{
 		"id": "letter_04",
 		"sender_name": "XO XO Beauty Hair Salon",
-		"sender_address": "5 Glamour Court, Toronto",
 		"recipient_name": "M. Hughes",
 		"address_line": "315 Maple Street",
 		"message": "",
@@ -54,7 +50,6 @@ const DAY_ONE_LETTERS := [
 	{
 		"id": "letter_05",
 		"sender_name": "A Friend",
-		"sender_address": "— return address withheld —",
 		"recipient_name": "K. Lyne",
 		"address_line": "313 Maple Street",
 		"message": "",
@@ -64,7 +59,6 @@ const DAY_ONE_LETTERS := [
 	{
 		"id": "letter_06",
 		"sender_name": "M.",
-		"sender_address": "— return address withheld —",
 		"recipient_name": "L. Hughes",
 		"address_line": "311 Maple Street",
 		"message": "",
@@ -86,7 +80,6 @@ func _build_day_one_letters() -> Array:
 		var m := Mail.new()
 		m.id = data["id"]
 		m.sender_name = data["sender_name"]
-		m.sender_address = data["sender_address"]
 		m.recipient_name = data["recipient_name"]
 		m.address_line = data["address_line"]
 		m.message = data["message"]

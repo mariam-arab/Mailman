@@ -408,8 +408,8 @@ func _fan_position(index: int, total: int) -> Vector2:
 	var step     := clampf(max_step, 55.0, 110.0)
 	var total_w  := EW + (total - 1) * step
 	var x        := (vp.x - total_w) * 0.5 + index * step
-	# Show ~95 px of card above the bottom edge.
-	var y        := vp.y - 46.0 - 95.0
+	# Show ~75 px of card above the bottom edge.
+	var y        := vp.y - 46.0 - 75.0
 	return Vector2(x, y)
 
 
@@ -523,25 +523,21 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 	sender.position      = Vector2(16, 8)
 	sender.size          = Vector2(130, 28)
 	sender.autowrap_mode = TextServer.AUTOWRAP_WORD
-	sender.add_theme_font_size_override("font_size", 9)
-	sender.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.38))
+	sender.add_theme_font_size_override("font_size", 10)
+	sender.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.30))
 
 	var addr := Label.new()
-	addr.name                 = "Address"
-	addr.position             = Vector2(14, 42)
-	addr.size                 = Vector2(EW - 28.0, 48.0)
-	addr.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	addr.autowrap_mode        = TextServer.AUTOWRAP_WORD
-	addr.add_theme_font_size_override("font_size", 17)
+	addr.name            = "Address"
+	addr.position        = Vector2(16, 50)
+	addr.size            = Vector2(EW - 28.0, 68.0)
+	addr.autowrap_mode   = TextServer.AUTOWRAP_WORD
+	addr.add_theme_font_size_override("font_size", 11)
 	addr.add_theme_color_override("font_color", td["ink"])
 
 	var recip := Label.new()
-	recip.name                 = "Recipient"
-	recip.position             = Vector2(14, 94)
-	recip.size                 = Vector2(EW - 28.0, 22.0)
-	recip.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	recip.add_theme_font_size_override("font_size", 11)
-	recip.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.28))
+	recip.name     = "Recipient"
+	recip.position = Vector2(-2000.0, -2000.0)
+	recip.size     = Vector2(0, 0)
 
 	front.add_child(sender)
 	front.add_child(addr)
@@ -686,9 +682,8 @@ func _apply_face(card: Panel, letter, showing_back: bool) -> void:
 		back.get_node("VBox/Clue").text = letter.message
 	else:
 		card.add_theme_stylebox_override("panel", card.get_meta("sty_front"))
-		front.get_node("Sender").text    = "%s\n%s" % [letter.sender_name, letter.sender_address]
-		front.get_node("Address").text   = letter.address_line
-		front.get_node("Recipient").text = letter.recipient_name
+		front.get_node("Sender").text  = "From:\n%s" % letter.sender_name
+		front.get_node("Address").text = "To:\n%s\n%s" % [letter.recipient_name, letter.address_line]
 
 
 # -- delivery slots ------------------------------------------------------------
