@@ -1,7 +1,8 @@
 extends Node3D
-## Tutorial level — Elmwood Avenue (houses 1401–1406).
-## Six deliveries introducing the core mechanic: some addresses are complete,
-## some are partially obscured. Walk up to Supervisor Bauer and press E to begin.
+## Final Tutor-Yale tutorial — Elmwood Avenue (houses 1401–1406).
+## Six deliveries where senders, names, and house numbers are each partly
+## missing. Bauer briefs the player, the player works it out, then Bauer hands
+## them off to Oakridge on their own.
 
 @export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_05/neighborhood_05.tscn"
 
@@ -14,61 +15,66 @@ var _day_complete: bool = false
 
 # ── letter data ───────────────────────────────────────────────────────────────
 
-const TUTORIAL_LETTERS := [
-	{   # Full address — straightforward.
-		"id": "tut_01",
-		"sender_name": "— unreadable —",
+const LETTERS := [
+	{
+		"id": "letter_01",
+		"sender_name": "Harper’s Department Store",
 		"recipient_name": "J. Dubois",
-		"address_line": "1401 Elmwood Avenue",
+		"address_line": "1401 Elmwood Avenue, Tutor-Yale",
 		"message": "",
 		"correct_house_id": "house_1401",
 		"difficulty": 1,
 	},
-	{   # Full address — straightforward.
-		"id": "tut_02",
-		"sender_name": "— unreadable —",
+	{
+		"id": "letter_02",
+		"sender_name": "Harborview Office Equipment",
 		"recipient_name": "Nina Jane",
-		"address_line": "1405 Elmwood Avenue",
+		"address_line": "1405 Elmwood Avenue, Tutor-Yale",
 		"message": "",
 		"correct_house_id": "house_1405",
 		"difficulty": 1,
 	},
-	{   # No recipient name — only the house number.
-		"id": "tut_03",
-		"sender_name": "— unreadable —",
-		"recipient_name": "Resident",
-		"address_line": "1403 Elmwood Avenue",
+	{
+		"id": "letter_03",
+		"sender_name": "Clara W.",
+		"recipient_name": "Sarah L.",
+		"address_line": "1403 Elmwood Avenue, Tutor-Yale",
 		"message": "",
 		"correct_house_id": "house_1403",
 		"difficulty": 1,
 	},
-	{   # Sender is a political party — the "Trust Me" poster on #1402 is a clue.
-		"id": "tut_04",
+	{   # Recipient's first name is obscured; the "Trust Me" poster on #1402 hints at a political-party sender.
+		"id": "letter_04",
 		"sender_name": "Best Political Party",
-		"recipient_name": "X. Garcia",
-		"address_line": "1402 Elmwood Avenue",
-		"message": "",
+		"recipient_name": "???? Garcia",
+		"address_line": "1402 Elmwood Avenue, Tutoreal",
+		"message": "Thank You for Your Support",
 		"correct_house_id": "house_1402",
 		"difficulty": 1,
 	},
 	{   # House number partially smudged ("XX06") — player infers 1406.
-		"id": "tut_05",
-		"sender_name": "— unreadable —",
+		"id": "letter_05",
+		"sender_name": "Sugarplum Bakery",
 		"recipient_name": "O. Farouk",
-		"address_line": "XX06 Elmwood Avenue",
+		"address_line": "XX06 Elmwood Avenue, Tutoreal",
 		"message": "",
 		"correct_house_id": "house_1406",
 		"difficulty": 2,
 	},
 	{   # No number at all — elimination points to the one remaining house (1404).
-		"id": "tut_06",
-		"sender_name": "— unreadable —",
+		"id": "letter_06",
+		"sender_name": "Albert Finley",
 		"recipient_name": "Jane Lee",
-		"address_line": "Elmwood Avenue",
+		"address_line": "Elmwood Avenue, Tutoreal",
 		"message": "",
 		"correct_house_id": "house_1404",
 		"difficulty": 2,
 	},
+]
+
+const OUTRO_LINES := [
+	"That's the lot — nicely done. You've passed Tutor-Yale.",
+	"From here you're on your own. Next stop's Oakridge. Good luck out there.",
 ]
 
 # ── camera ────────────────────────────────────────────────────────────────────
@@ -88,11 +94,17 @@ func _ready() -> void:
 
 func _on_day_ended(_day: int, _results: Array) -> void:
 	_day_complete = true
+	var portrait := {
+		"skin": boss.portrait_skin,
+		"body": boss.portrait_body,
+		"cap":  boss.portrait_cap,
+	}
+	hud.open_dialogue(OUTRO_LINES, boss.speaker_name, portrait)
 
 
 func _build_letters() -> Array:
 	var letters: Array = []
-	for data in TUTORIAL_LETTERS:
+	for data in LETTERS:
 		var m := Mail.new()
 		m.id             = data["id"]
 		m.sender_name    = data["sender_name"]

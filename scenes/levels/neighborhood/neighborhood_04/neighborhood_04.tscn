@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bcray1nclg3hm"]
 
-[ext_resource type="Script" uid="uid://cienirngv2bur" path="res://scenes/levels/neighborhood/neighborhood_04/neighborhood_04.gd" id="1_tutorial"]
+[ext_resource type="Script" uid="uid://cienirngv2bur" path="res://scenes/levels/neighborhood/neighborhood_04/neighborhood_04.gd" id="1_neighborhood"]
 [ext_resource type="PackedScene" uid="uid://choy2q1kv47l2" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://b1mailman1hud" path="res://scenes/ui/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://dubcydii5iy53" path="res://scenes/houses/house.tscn" id="4_house"]
@@ -106,8 +106,8 @@ albedo_color = Color(0.92, 0.78, 0.55, 1)
 [sub_resource type="StandardMaterial3D" id="Material_tile_c"]
 albedo_color = Color(0.78, 0.62, 0.78, 1)
 
-[node name="Tutorial01" type="Node3D" unique_id=1711322753]
-script = ExtResource("1_tutorial")
+[node name="Neighborhood04" type="Node3D" unique_id=1711322753]
+script = ExtResource("1_neighborhood")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1338903185]
 environment = SubResource("Environment_paper")
@@ -487,7 +487,7 @@ surface_material_override/0 = SubResource("Material_tile_c")
 [node name="Boss" parent="." unique_id=1203973441 instance=ExtResource("10_gossip")]
 transform = Transform3D(-0.8746088, 0.017442474, 0.48461807, 0.01688344, 1.2198253, 0.0009726048, -0.48453492, 0.0110198585, -0.8747251, 0.3, 0, 43.2)
 speaker_name = "Supervisor Bauer"
-intro_lines = ["Ah! You must be the new carrier. Welcome, name's Bauer your supervisor.", "Now, the last few carriers... they moved on. Quite suddenly. Ha! Don't, erm, read into that.", "Right. Mail around here can be a bit unusual. Addresses, names, things go missing sometimes.", "Your job is to figure out where each letter belongs using whatever's on the envelope.", "Move to a house with A and D, and press Tab to open your bag.", "Drag an envelope onto the slot to deliver it.", "Six deliveries today. Should be simple enough. Mostly. Good luck!"]
+intro_lines = ["Right — here's our last Tutor-Yale stop. Elmwood Avenue, six letters, houses 1401 to 1406.", "Now, some of this mail's got bits missing. Names, numbers, a town smudged funny — you know the drill.", "Use what you do know first. A sender, a poster on a door, a house you've already ruled out — anything helps.", "Finish these six and we'll call Tutor-Yale done. Off you go."]
 portrait_body = Color(0.16, 0.3, 0.6, 1)
 portrait_cap = Color(0.78, 0.12, 0.12, 1)
 
