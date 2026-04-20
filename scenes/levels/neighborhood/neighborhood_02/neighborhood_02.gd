@@ -4,7 +4,7 @@ extends Node3D
 ## missing recipient names, not the houses themselves. Boss intro previews
 ## the "mail comes in rough shape" quirk before the first delivery.
 
-@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_04/neighborhood_04.tscn"
+@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_03/neighborhood_03.tscn"
 
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD
