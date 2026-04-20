@@ -8,7 +8,7 @@ extends Node3D
 
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD
-@onready var boss:        Gossip          = $Boss
+@onready var gossip:      Gossip          = $Gossip
 @onready var side_camera: Camera3D        = $SideCamera
 
 var _day_complete: bool = false
@@ -95,11 +95,11 @@ func _ready() -> void:
 func _on_day_ended(_day: int, _results: Array) -> void:
 	_day_complete = true
 	var portrait := {
-		"skin": boss.portrait_skin,
-		"body": boss.portrait_body,
-		"cap":  boss.portrait_cap,
+		"skin": gossip.portrait_skin,
+		"body": gossip.portrait_body,
+		"cap":  gossip.portrait_cap,
 	}
-	hud.open_dialogue(OUTRO_LINES, boss.speaker_name, portrait)
+	hud.open_dialogue(OUTRO_LINES, gossip.speaker_name, portrait)
 
 
 func _build_letters() -> Array:
