@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Special Delivery"
 config/description="A cozy first-person mailman puzzle game set in a paper-craft 1960s Canadian neighborhood."
-run/main_scene="res://scenes/levels/willis_01.tscn"
+run/main_scene="res://scenes/levels/neighborhood/neighborhood_01/neighborhood_01.tscn"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
