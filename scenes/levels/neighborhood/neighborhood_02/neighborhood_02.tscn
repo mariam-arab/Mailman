@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bro5r0gr4v258"]
 
-[ext_resource type="Script" uid="uid://cy0bo1vxmi5n6" path="res://scenes/levels/neighborhood/neighborhood_02/neighborhood_02.gd" id="1_1qq61"]
+[ext_resource type="Script" uid="uid://cy0bo1vxmi5n6" path="res://scenes/levels/neighborhood/neighborhood_02/neighborhood_02.gd" id="1_neighborhood"]
 [ext_resource type="PackedScene" uid="uid://dubcydii0fs72" path="res://scenes/props/cloud.tscn" id="2_emplk"]
 [ext_resource type="PackedScene" uid="uid://cm5gqrhvksm0w" path="res://scenes/props/tree.tscn" id="3_d0upm"]
 [ext_resource type="PackedScene" uid="uid://dubcydiiycvo6" path="res://scenes/props/birch_tree.tscn" id="4_piuyn"]
@@ -94,8 +94,8 @@ size = Vector3(0.08, 0.36, 1.6)
 [sub_resource type="StandardMaterial3D" id="Material_street_board"]
 albedo_color = Color(0.18, 0.36, 0.58, 1)
 
-[node name="Bluewater02" type="Node3D" unique_id=3001]
-script = ExtResource("1_1qq61")
+[node name="Neighborhood02" type="Node3D" unique_id=3001]
+script = ExtResource("1_neighborhood")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=3002]
 environment = SubResource("Environment_paper")
@@ -120,7 +120,7 @@ mesh = SubResource("PrismMesh_mountain")
 surface_material_override/0 = SubResource("Material_mountain")
 
 [node name="Mountain2" type="MeshInstance3D" parent="." unique_id=3006]
-transform = Transform3D(0.8, 0, 0, 0, 1.3, 0, 0, 0, 0.7, -27.902124, 8.184447, 10.0)
+transform = Transform3D(0.8, 0, 0, 0, 1.3, 0, 0, 0, 0.7, -27.902124, 8.184447, 10)
 mesh = SubResource("PrismMesh_mountain")
 surface_material_override/0 = SubResource("Material_mountain")
 
@@ -393,12 +393,11 @@ surface_material_override/0 = SubResource("Material_street_board")
 
 [node name="SignText" type="Label3D" parent="StreetSign" unique_id=3043]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.05, 2.4, 0)
-pixel_size = 0.005
+modulate = Color(0.98, 0.96, 0.92, 1)
+outline_modulate = Color(0.08, 0.16, 0.3, 1)
 text = "BLUEWATER DR"
 font_size = 52
 outline_size = 6
-outline_modulate = Color(0.08, 0.16, 0.3, 1)
-modulate = Color(0.98, 0.96, 0.92, 1)
 
 [node name="Boss" parent="." unique_id=3044 instance=ExtResource("8_guiog")]
 transform = Transform3D(-0.8746088, 0.017442474, 0.48461807, 0.01688344, 1.2198253, 0.0009726048, -0.48453492, 0.0110198585, -0.8747251, 0.3, 0, 43.2)
