@@ -1,8 +1,8 @@
 extends Node3D
-## Intro tutorial — Willis Street, Tutoreal (houses 890–891).
-## Two deliveries on a short street. Supervisor Bauer's first-day welcome,
-## then a simple "read the address, pick the matching mailbox" exercise.
-## Finishing this level advances the player to the longer Elmwood tutorial.
+## Neighbourhood level — Bluewater Drive, Tutoreal (houses 321–324).
+## Four identical-looking houses; the puzzle is the address smudges and
+## missing recipient names, not the houses themselves. Boss intro previews
+## the "mail comes in rough shape" quirk before the first delivery.
 
 @export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_04/neighborhood_04.tscn"
 
@@ -13,23 +13,41 @@ extends Node3D
 
 var _day_complete: bool = false
 
-const WILLIS_LETTERS := [
+const LETTERS := [
 	{
 		"id": "letter_01",
-		"sender_name": "Theo Grant",
-		"recipient_name": "Eva Laurent",
-		"address_line": "891 Willis Street, Tutoreal",
+		"sender_name": "J. Pike",
+		"recipient_name": "XXXX Costa",
+		"address_line": "322 Bluewater Drive, Tutoreal",
 		"message": "",
-		"correct_house_id": "house_891",
+		"correct_house_id": "house_322",
 		"difficulty": 1,
 	},
 	{
 		"id": "letter_02",
-		"sender_name": "Priya Desai",
-		"recipient_name": "Liam Carter",
-		"address_line": "890 Elmwood Avenue, Tutoreal",
+		"sender_name": "Marta ZXXXX",
+		"recipient_name": "Owen Fischer",
+		"address_line": "321 Bluewater Drive, Tutoreal",
 		"message": "",
-		"correct_house_id": "house_890",
+		"correct_house_id": "house_321",
+		"difficulty": 1,
+	},
+	{
+		"id": "letter_03",
+		"sender_name": "Victor H.",
+		"recipient_name": "S. Blake",
+		"address_line": "324 Bluewater Drive, Tutoreal",
+		"message": "",
+		"correct_house_id": "house_324",
+		"difficulty": 1,
+	},
+	{
+		"id": "letter_04",
+		"sender_name": "Shark Investors Group",
+		"recipient_name": "Daphne Rodes",
+		"address_line": "323 Bluewater Drive, Tutoreal",
+		"message": "",
+		"correct_house_id": "house_323",
 		"difficulty": 1,
 	},
 ]
@@ -41,7 +59,7 @@ const WILLIS_LETTERS := [
 
 func _ready() -> void:
 	hud.bind_player(player)
-	GameState.start_day(1, _build_letters())
+	GameState.start_day(2, _build_letters())
 	_update_camera_transform(1.0)
 	GameState.day_ended.connect(_on_day_ended)
 
@@ -52,7 +70,7 @@ func _on_day_ended(_day: int, _results: Array) -> void:
 
 func _build_letters() -> Array:
 	var letters: Array = []
-	for data in WILLIS_LETTERS:
+	for data in LETTERS:
 		var m := Mail.new()
 		m.id               = data["id"]
 		m.sender_name      = data["sender_name"]

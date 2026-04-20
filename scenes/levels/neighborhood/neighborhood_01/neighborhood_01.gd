@@ -4,7 +4,7 @@ extends Node3D
 ## then a simple "read the address, pick the matching mailbox" exercise.
 ## Finishing this level advances the player to the longer Elmwood tutorial.
 
-@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_04/neighborhood_04.tscn"
+@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_02/neighborhood_02.tscn"
 
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD
@@ -13,7 +13,7 @@ extends Node3D
 
 var _day_complete: bool = false
 
-const WILLIS_LETTERS := [
+const LETTERS := [
 	{
 		"id": "letter_01",
 		"sender_name": "Theo Grant",
@@ -52,7 +52,7 @@ func _on_day_ended(_day: int, _results: Array) -> void:
 
 func _build_letters() -> Array:
 	var letters: Array = []
-	for data in WILLIS_LETTERS:
+	for data in LETTERS:
 		var m := Mail.new()
 		m.id               = data["id"]
 		m.sender_name      = data["sender_name"]
