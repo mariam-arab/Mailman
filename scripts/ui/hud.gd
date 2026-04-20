@@ -599,15 +599,15 @@ func _make_envelope(letter, index: int, total: int) -> Panel:
 	var sender := Label.new()
 	sender.name          = "Sender"
 	sender.position      = Vector2(16, 8)
-	sender.size          = Vector2(130, 28)
+	sender.size          = Vector2(130, 42)
 	sender.autowrap_mode = TextServer.AUTOWRAP_WORD
 	sender.add_theme_font_size_override("font_size", 10)
 	sender.add_theme_color_override("font_color", td["ink"].lerp(Color.WHITE, 0.30))
 
 	var addr := Label.new()
 	addr.name            = "Address"
-	addr.position        = Vector2(16, 50)
-	addr.size            = Vector2(EW - 28.0, 68.0)
+	addr.position        = Vector2(16, 56)
+	addr.size            = Vector2(EW - 28.0, 62.0)
 	addr.autowrap_mode   = TextServer.AUTOWRAP_WORD
 	addr.add_theme_font_size_override("font_size", 11)
 	addr.add_theme_color_override("font_color", td["ink"])
