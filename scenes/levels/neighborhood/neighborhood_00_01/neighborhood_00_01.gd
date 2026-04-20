@@ -1,10 +1,10 @@
 extends Node3D
-## Neighbourhood level — Bluewater Drive, Tutoreal (houses 321–324).
-## Four identical-looking houses; the puzzle is the address smudges and
-## missing recipient names, not the houses themselves. Boss intro previews
-## the "mail comes in rough shape" quirk before the first delivery.
+## Intro tutorial — Willis Street, Tutoreal (houses 890–891).
+## Two deliveries on a short street. Supervisor Bauer's first-day welcome,
+## then a simple "read the address, pick the matching mailbox" exercise.
+## Finishing this level advances the player to the longer Elmwood tutorial.
 
-@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_03/neighborhood_03.tscn"
+@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_00_02/neighborhood_00_02.tscn"
 
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD
@@ -16,38 +16,20 @@ var _day_complete: bool = false
 const LETTERS := [
 	{
 		"id": "letter_01",
-		"sender_name": "J. Pike",
-		"recipient_name": "XXXX Costa",
-		"address_line": "322 Bluewater Drive, Tutoreal",
+		"sender_name": "Theo Grant",
+		"recipient_name": "Eva Laurent",
+		"address_line": "891 Willis Street, Tutoreal",
 		"message": "",
-		"correct_house_id": "house_322",
+		"correct_house_id": "house_891",
 		"difficulty": 1,
 	},
 	{
 		"id": "letter_02",
-		"sender_name": "Marta ZXXXX",
-		"recipient_name": "Owen Fischer",
-		"address_line": "321 Bluewater Drive, Tutoreal",
+		"sender_name": "Priya Desai",
+		"recipient_name": "Liam Carter",
+		"address_line": "890 Elmwood Avenue, Tutoreal",
 		"message": "",
-		"correct_house_id": "house_321",
-		"difficulty": 1,
-	},
-	{
-		"id": "letter_03",
-		"sender_name": "Victor H.",
-		"recipient_name": "S. Blake",
-		"address_line": "324 Bluewater Drive, Tutoreal",
-		"message": "",
-		"correct_house_id": "house_324",
-		"difficulty": 1,
-	},
-	{
-		"id": "letter_04",
-		"sender_name": "Shark Investors Group",
-		"recipient_name": "Daphne Rodes",
-		"address_line": "323 Bluewater Drive, Tutoreal",
-		"message": "",
-		"correct_house_id": "house_323",
+		"correct_house_id": "house_890",
 		"difficulty": 1,
 	},
 ]
@@ -59,7 +41,7 @@ const LETTERS := [
 
 func _ready() -> void:
 	hud.bind_player(player)
-	GameState.start_day(2, _build_letters())
+	GameState.start_day(1, _build_letters())
 	_update_camera_transform(1.0)
 	GameState.day_ended.connect(_on_day_ended)
 

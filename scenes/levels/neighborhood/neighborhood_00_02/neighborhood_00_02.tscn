@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bro5r0gr4v258"]
 
-[ext_resource type="Script" uid="uid://cy0bo1vxmi5n6" path="res://scenes/levels/neighborhood/neighborhood_02/neighborhood_02.gd" id="1_neighborhood"]
+[ext_resource type="Script" uid="uid://cy0bo1vxmi5n6" path="res://scenes/levels/neighborhood/neighborhood_00_02/neighborhood_00_02.gd" id="1_neighborhood"]
 [ext_resource type="PackedScene" uid="uid://dubcydii0fs72" path="res://scenes/props/cloud.tscn" id="2_emplk"]
 [ext_resource type="PackedScene" uid="uid://cm5gqrhvksm0w" path="res://scenes/props/tree.tscn" id="3_d0upm"]
 [ext_resource type="PackedScene" uid="uid://dubcydiiycvo6" path="res://scenes/props/birch_tree.tscn" id="4_piuyn"]
