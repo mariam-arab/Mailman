@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c5apt01sdaf5"]
 
-[ext_resource type="Script" uid="uid://c5aplvl3n8j5" path="res://scenes/levels/apartment/apartment_01/apartment_01.gd" id="1_aplevel"]
+[ext_resource type="Script" uid="uid://c5aplvl3n8j5" path="res://scenes/levels/apartment/apartment_01/apartment_01.gd" id="1_apartment"]
 [ext_resource type="PackedScene" uid="uid://choy2q1kv47l2" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://b1mailman1hud" path="res://scenes/ui/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://c5aptscdr806" path="res://scenes/interactables/apartment_door.tscn" id="4_door"]
@@ -97,7 +97,7 @@ albedo_color = Color(0.82, 0.92, 0.84, 1)
 roughness = 0.65
 
 [node name="Apartment01" type="Node3D" unique_id=1001]
-script = ExtResource("1_aplevel")
+script = ExtResource("1_apartment")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1002]
 environment = SubResource("Environment_paper")

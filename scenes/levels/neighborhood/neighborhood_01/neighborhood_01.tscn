@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cw1sr0sn6xymw"]
 
-[ext_resource type="Script" path="res://scenes/levels/neighborhood/neighborhood_01/neighborhood_01.gd" id="1_willis"]
+[ext_resource type="Script" uid="uid://b5fq0umg6pdqq" path="res://scenes/levels/neighborhood/neighborhood_01/neighborhood_01.gd" id="1_neighborhood"]
 [ext_resource type="PackedScene" uid="uid://choy2q1kv47l2" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://b1mailman1hud" path="res://scenes/ui/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://dubcydii5iy53" path="res://scenes/houses/house.tscn" id="4_house"]
@@ -86,7 +86,7 @@ albedo_color = Color(0.78, 0.62, 0.78, 1)
 size = Vector3(0.1, 2.4, 0.1)
 
 [sub_resource type="StandardMaterial3D" id="Material_street_post"]
-albedo_color = Color(0.45, 0.34, 0.20, 1)
+albedo_color = Color(0.45, 0.34, 0.2, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_street_sign_board"]
 size = Vector3(0.08, 0.36, 1.6)
@@ -94,8 +94,8 @@ size = Vector3(0.08, 0.36, 1.6)
 [sub_resource type="StandardMaterial3D" id="Material_street_board"]
 albedo_color = Color(0.28, 0.42, 0.72, 1)
 
-[node name="Willis01" type="Node3D" unique_id=3001]
-script = ExtResource("1_willis")
+[node name="Neighborhood01" type="Node3D" unique_id=3001]
+script = ExtResource("1_neighborhood")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=3002]
 environment = SubResource("Environment_paper")
@@ -120,7 +120,7 @@ mesh = SubResource("PrismMesh_mountain")
 surface_material_override/0 = SubResource("Material_mountain")
 
 [node name="Mountain2" type="MeshInstance3D" parent="." unique_id=3006]
-transform = Transform3D(0.8, 0, 0, 0, 1.3, 0, 0, 0, 0.7, -27.902124, 8.184447, 14.2670517)
+transform = Transform3D(0.8, 0, 0, 0, 1.3, 0, 0, 0, 0.7, -27.902124, 8.184447, 14.267052)
 mesh = SubResource("PrismMesh_mountain")
 surface_material_override/0 = SubResource("Material_mountain")
 
@@ -276,12 +276,11 @@ surface_material_override/0 = SubResource("Material_street_board")
 
 [node name="SignText" type="Label3D" parent="StreetSign" unique_id=3043]
 transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.05, 2.4, 0)
-pixel_size = 0.005
+modulate = Color(0.98, 0.96, 0.92, 1)
+outline_modulate = Color(0.1, 0.18, 0.34, 1)
 text = "WILLIS ST"
 font_size = 52
 outline_size = 6
-outline_modulate = Color(0.1, 0.18, 0.34, 1)
-modulate = Color(0.98, 0.96, 0.92, 1)
 
 [node name="Boss" parent="." unique_id=3044 instance=ExtResource("10_boss")]
 transform = Transform3D(-0.8746088, 0.017442474, 0.48461807, 0.01688344, 1.2198253, 0.0009726048, -0.48453492, 0.0110198585, -0.8747251, 0.3, 0, 43.2)
