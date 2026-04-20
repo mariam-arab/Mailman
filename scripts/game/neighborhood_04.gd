@@ -3,7 +3,7 @@ extends Node3D
 ## Six deliveries introducing the core mechanic: some addresses are complete,
 ## some are partially obscured. Walk up to Supervisor Bauer and press E to begin.
 
-@export var next_level_path: String = "res://scenes/levels/neighborhood_02.tscn"
+@export var next_level_path: String = "res://scenes/levels/neighborhood_05.tscn"
 
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD
