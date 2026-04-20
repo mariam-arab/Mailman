@@ -161,6 +161,53 @@ autowrap_mode = 3
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.22, 0.15, 0.10, 1)
 
+; --- Floor picker (elevator) ---
+[node name="FloorPicker" type="Panel" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_top = -140.0
+offset_right = 180.0
+offset_bottom = 140.0
+theme_override_styles/panel = SubResource("StyleBox_card")
+
+[node name="Title" type="Label" parent="FloorPicker"]
+anchor_right = 1.0
+offset_top = 18.0
+offset_bottom = 44.0
+text = "Choose floor"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.22, 0.15, 0.10, 1)
+
+[node name="Options" type="Label" parent="FloorPicker"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 56.0
+offset_right = -24.0
+offset_bottom = -52.0
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.18, 0.12, 0.08, 1)
+theme_override_constants/line_spacing = 6
+
+[node name="Hint" type="Label" parent="FloorPicker"]
+anchor_right = 1.0
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -36.0
+offset_bottom = -14.0
+text = "press a number to go   |   Esc to cancel"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.55, 0.38, 0.22, 1)
+
 ; --- Gossip / NPC dialogue panel ---
 [node name="DialoguePanel" type="Panel" parent="."]
 visible = false

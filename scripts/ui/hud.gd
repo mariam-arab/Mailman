@@ -16,6 +16,8 @@ extends CanvasLayer
 @onready var dialogue_speaker:   Label   = $DialoguePanel/Speaker
 @onready var dialogue_text:      Label   = $DialoguePanel/Text
 @onready var dialogue_hint:      Label   = $DialoguePanel/Hint
+@onready var floor_picker:         Panel = $FloorPicker
+@onready var floor_picker_options: Label = $FloorPicker/Options
 
 # -- envelope themes -----------------------------------------------------------
 
@@ -94,6 +96,11 @@ var _dialogue_idx: int         = 0
 var _nearby_interactable       = null
 var _cards: Array              = []
 
+var _floor_picker_open: bool   = false
+var _floor_picker_labels: Array = []
+var _floor_picker_current: int  = 0
+var _floor_picker_callback: Callable = Callable()
+
 const MAX_PULLED                := 2
 const DRAG_THRESHOLD            := 8.0
 var _pull_cards: Array          = []
@@ -124,6 +131,7 @@ func _ready() -> void:
 	inspection.visible     = false
 	summary.visible        = false
 	dialogue_panel.visible = false
+	floor_picker.visible   = false
 	prompt_label.text      = ""
 	GameState.day_started.connect(_on_day_started)
 	GameState.day_ended.connect(_on_day_ended)
@@ -191,6 +199,35 @@ func open_inspection() -> void:
 	_showing_inspection = true
 	inspection.visible  = true
 	_rebuild_envelopes()
+
+
+func open_floor_picker(labels: Array, current_idx: int, on_choose: Callable) -> void:
+	_floor_picker_labels   = labels
+	_floor_picker_current  = current_idx
+	_floor_picker_callback = on_choose
+	_render_floor_picker()
+	floor_picker.visible   = true
+	_floor_picker_open     = true
+	if _player and _player.has_method("set_input_active"):
+		_player.set_input_active(false)
+
+
+func close_floor_picker() -> void:
+	if not _floor_picker_open:
+		return
+	_floor_picker_open     = false
+	_floor_picker_callback = Callable()
+	floor_picker.visible   = false
+	if _player and _player.has_method("set_input_active"):
+		_player.set_input_active(true)
+
+
+func _render_floor_picker() -> void:
+	var lines: Array = []
+	for i in _floor_picker_labels.size():
+		var prefix := "> " if i == _floor_picker_current else "   "
+		lines.append("%s%d.   %s" % [prefix, i + 1, str(_floor_picker_labels[i])])
+	floor_picker_options.text = "\n".join(lines)
 
 
 func open_dialogue(lines: Array, speaker_name: String = "", portrait: Dictionary = {}) -> void:
@@ -272,6 +309,26 @@ func _close_dialogue() -> void:
 # -- input ---------------------------------------------------------------------
 
 func _input(event: InputEvent) -> void:
+	if _floor_picker_open:
+		if event is InputEventKey and event.pressed and not event.echo:
+			var k: int = event.keycode
+			if k >= KEY_1 and k <= KEY_9:
+				var idx := k - KEY_1
+				if idx < _floor_picker_labels.size():
+					var cb := _floor_picker_callback
+					close_floor_picker()
+					if cb.is_valid():
+						cb.call(idx)
+					get_viewport().set_input_as_handled()
+					return
+			if k == KEY_ESCAPE:
+				close_floor_picker()
+				get_viewport().set_input_as_handled()
+				return
+		if event is InputEventKey or event is InputEventMouseButton:
+			get_viewport().set_input_as_handled()
+		return
+
 	if _dialogue_lines.size() > 0 and event.is_action_pressed("interact"):
 		_dialogue_idx += 1
 		if _dialogue_idx >= _dialogue_lines.size():
