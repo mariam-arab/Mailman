@@ -4,7 +4,7 @@ extends Node3D
 ## missing. Bauer briefs the player, the player works it out, then Bauer hands
 ## them off to Oakridge on their own.
 
-@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_05/neighborhood_05.tscn"
+@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_01_02/neighborhood_01_02.tscn"
 
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD
