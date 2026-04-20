@@ -13,8 +13,6 @@ extends Node3D
 
 var _day_complete: bool = false
 
-# ── letter data ───────────────────────────────────────────────────────────────
-
 const LETTERS := [
 	{
 		"id": "letter_01",

@@ -1,0 +1,492 @@
+[gd_scene format=3 uid="uid://y1e8i2jj7unc"]
+
+[ext_resource type="Script" uid="uid://b7puakmxwv3rf" path="res://scenes/levels/neighborhood/neighborhood_01_03/neighborhood_01_03.gd" id="1_level"]
+[ext_resource type="PackedScene" uid="uid://choy2q1kv47l2" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://b1mailman1hud" path="res://scenes/ui/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://dubcydii5iy53" path="res://scenes/houses/house.tscn" id="4_house"]
+[ext_resource type="PackedScene" uid="uid://b88jjx0smyvlf" path="res://scenes/interactables/mailbox.tscn" id="5_mailbox"]
+[ext_resource type="PackedScene" uid="uid://cm5gqrhvksm0w" path="res://scenes/props/tree.tscn" id="6_tree"]
+[ext_resource type="PackedScene" uid="uid://dubcydiiycvo6" path="res://scenes/props/birch_tree.tscn" id="7_birch"]
+[ext_resource type="PackedScene" uid="uid://dubcydii0fs72" path="res://scenes/props/cloud.tscn" id="9_cloud"]
+[ext_resource type="PackedScene" uid="uid://bdp15q37wljtl" path="res://scenes/interactables/gossip.tscn" id="10_gossip"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.42, 0.72, 0.96, 1)
+sky_horizon_color = Color(0.72, 0.9, 0.98, 1)
+ground_bottom_color = Color(0.5, 0.48, 0.4, 1)
+ground_horizon_color = Color(0.72, 0.78, 0.68, 1)
+sun_angle_max = 60.0
+sun_curve = 0.25
+
+[sub_resource type="Sky" id="Sky_paper"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_paper"]
+background_mode = 2
+sky = SubResource("Sky_paper")
+ambient_light_source = 3
+ambient_light_color = Color(0.96, 0.94, 0.88, 1)
+ambient_light_sky_contribution = 0.4
+ambient_light_energy = 1.05
+tonemap_mode = 3
+tonemap_exposure = 1.15
+tonemap_white = 6.0
+glow_enabled = true
+glow_intensity = 0.35
+glow_strength = 1.05
+glow_bloom = 0.05
+
+[sub_resource type="PrismMesh" id="PrismMesh_mountain"]
+size = Vector3(0.5, 14, 90)
+
+[sub_resource type="StandardMaterial3D" id="Material_mountain"]
+albedo_color = Color(0.42, 0.52, 0.38, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_sun"]
+radius = 1.6
+height = 3.0
+radial_segments = 16
+rings = 8
+
+[sub_resource type="StandardMaterial3D" id="Material_sun"]
+albedo_color = Color(0.98, 0.85, 0.35, 1)
+emission_enabled = true
+emission = Color(0.98, 0.85, 0.35, 1)
+emission_energy_multiplier = 1.4
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
+size = Vector3(28, 0.4, 90)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ground"]
+size = Vector3(28, 0.4, 90)
+
+[sub_resource type="StandardMaterial3D" id="Material_grass"]
+albedo_color = Color(0.38, 0.72, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sidewalk"]
+size = Vector3(2.4, 0.08, 90)
+
+[sub_resource type="StandardMaterial3D" id="Material_sidewalk"]
+albedo_color = Color(0.88, 0.78, 0.58, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sign_post"]
+size = Vector3(0.1, 1.8, 0.1)
+
+[sub_resource type="StandardMaterial3D" id="Material_sign_post"]
+albedo_color = Color(0.5, 0.38, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_street_board"]
+size = Vector3(0.06, 0.34, 2)
+
+[sub_resource type="StandardMaterial3D" id="Material_street_board"]
+albedo_color = Color(0.22, 0.38, 0.62, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_leaf"]
+size = Vector3(0.3, 0.04, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="Material_leaf_red"]
+albedo_color = Color(0.78, 0.2, 0.18, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_leaf_orange"]
+albedo_color = Color(0.92, 0.48, 0.18, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_leaf_yellow"]
+albedo_color = Color(0.95, 0.78, 0.22, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tile"]
+size = Vector3(0.06, 0.06, 1.6)
+
+[sub_resource type="StandardMaterial3D" id="Material_tile_a"]
+albedo_color = Color(0.62, 0.78, 0.62, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_tile_b"]
+albedo_color = Color(0.92, 0.78, 0.55, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_tile_c"]
+albedo_color = Color(0.78, 0.62, 0.78, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_msday_pants"]
+albedo_color = Color(0.26, 0.22, 0.3, 1)
+
+[sub_resource type="StandardMaterial3D" id="Material_msday_dress"]
+albedo_color = Color(0.28, 0.48, 0.52, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Material_msday_skin"]
+albedo_color = Color(0.93, 0.78, 0.62, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_msday_hair"]
+size = Vector3(0.44, 0.3, 0.42)
+
+[sub_resource type="StandardMaterial3D" id="Material_msday_hair"]
+albedo_color = Color(0.42, 0.28, 0.18, 1)
+
+[node name="Neighborhood01_03" type="Node3D" unique_id=845223095]
+script = ExtResource("1_level")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=440443432]
+environment = SubResource("Environment_paper")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1487169205]
+transform = Transform3D(0.866025, 0.353553, -0.353553, 0, 0.707107, 0.707107, 0.5, -0.612372, 0.612372, 0, 12, 30.2)
+light_color = Color(1, 0.92, 0.78, 1)
+light_energy = 1.5
+shadow_enabled = true
+directional_shadow_max_distance = 80.0
+
+[node name="SideCamera" type="Camera3D" parent="." unique_id=905689740]
+transform = Transform3D(0, -0.407, 0.913, 0, 0.913, 0.407, -1, 0, 0, 11, 9, 44.2)
+current = true
+fov = 35.0
+near = 0.1
+far = 150.0
+
+[node name="Mountain1" type="MeshInstance3D" parent="." unique_id=207966482]
+transform = Transform3D(1.0748825, 0, 0, 0, 3.034693, 0, 0, 0, 1.4378492, -35.284134, 8.931391, 18.649454)
+mesh = SubResource("PrismMesh_mountain")
+surface_material_override/0 = SubResource("Material_mountain")
+
+[node name="Mountain2" type="MeshInstance3D" parent="." unique_id=745134888]
+transform = Transform3D(0.8, 0, 0, 0, 1.3, 0, 0, 0, 0.7, -27.902124, 8.184447, 4.2670517)
+mesh = SubResource("PrismMesh_mountain")
+surface_material_override/0 = SubResource("Material_mountain")
+
+[node name="Mountain3" type="MeshInstance3D" parent="." unique_id=409930605]
+transform = Transform3D(0.75, 0, 0, 0, 1.2, 0, 0, 0, 0.65, -24.493343, 10.342112, 27.737562)
+mesh = SubResource("PrismMesh_mountain")
+surface_material_override/0 = SubResource("Material_mountain")
+
+[node name="SunDisc" type="MeshInstance3D" parent="." unique_id=1515201821]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 12.5, 18)
+mesh = SubResource("SphereMesh_sun")
+surface_material_override/0 = SubResource("Material_sun")
+
+[node name="Cloud1" parent="." unique_id=1708776599 instance=ExtResource("9_cloud")]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -24, 10.6, -4)
+
+[node name="Cloud2" parent="." unique_id=1137939048 instance=ExtResource("9_cloud")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, 11.3, 15)
+
+[node name="Cloud3" parent="." unique_id=435506856 instance=ExtResource("9_cloud")]
+transform = Transform3D(0.9, 0, 0, 0, 0.9, 0, 0, 0, 0.9, -23, 9.5, 34)
+
+[node name="Cloud4" parent="." unique_id=1613639342 instance=ExtResource("9_cloud")]
+transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, -24, 11.8, -18)
+
+[node name="BgTree1" parent="." unique_id=1892643285 instance=ExtResource("6_tree")]
+transform = Transform3D(1, 0, 0, 0, 1.15, 0, 0, 0, 1, -14, 0, 41.2)
+
+[node name="BgTree2" parent="." unique_id=1154827811 instance=ExtResource("6_tree")]
+transform = Transform3D(1.05, 0, 0, 0, 1.2, 0, 0, 0, 1.05, -14, 0, 25.2)
+
+[node name="BgTree3" parent="." unique_id=2118117199 instance=ExtResource("6_tree")]
+transform = Transform3D(0.95, 0, 0, 0, 1.1, 0, 0, 0, 0.95, -14, 0, 8.2)
+
+[node name="BgTree4" parent="." unique_id=1349481055 instance=ExtResource("6_tree")]
+transform = Transform3D(1, 0, 0, 0, 1.15, 0, 0, 0, 1, -14, 0, -7.8)
+
+[node name="BgBirch1" parent="." unique_id=715716750 instance=ExtResource("7_birch")]
+transform = Transform3D(1.1, 0, 0, 0, 1.25, 0, 0, 0, 1.1, -12.5, 0, 34.2)
+
+[node name="BgBirch2" parent="." unique_id=110239177 instance=ExtResource("7_birch")]
+transform = Transform3D(1.1, 0, 0, 0, 1.25, 0, 0, 0, 1.1, -12.5, 0, 16.2)
+
+[node name="BgBirch3" parent="." unique_id=918678300 instance=ExtResource("7_birch")]
+transform = Transform3D(1.1, 0, 0, 0, 1.25, 0, 0, 0, 1.1, -12.5, 0, -1.8)
+
+[node name="Ground" type="StaticBody3D" parent="." unique_id=753622876]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground" unique_id=1624997087]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.5, -0.2, 22.2)
+shape = SubResource("BoxShape3D_ground")
+
+[node name="GrassMesh" type="MeshInstance3D" parent="Ground" unique_id=859825201]
+transform = Transform3D(1.9818785, 0, 0, 0, 1.1673965, 0, 0, 0, 1.1673965, -11.522079, -0.19999237, 22.147429)
+mesh = SubResource("BoxMesh_ground")
+surface_material_override/0 = SubResource("Material_grass")
+
+[node name="Sidewalk" type="MeshInstance3D" parent="." unique_id=1934077450]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.04, 22.2)
+mesh = SubResource("BoxMesh_sidewalk")
+surface_material_override/0 = SubResource("Material_sidewalk")
+
+[node name="House138" parent="." unique_id=1133146648 instance=ExtResource("4_house")]
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -6.4, 0, 41.2)
+body_color = Color(0.88, 0.86, 0.72, 1)
+roof_color = Color(0.58, 0.42, 0.22, 1)
+house_label = "138"
+
+[node name="Mailbox138" parent="." unique_id=1520713844 instance=ExtResource("5_mailbox")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0, 40.4)
+house_id = "house_138"
+house_label = "138"
+
+[node name="House139" parent="." unique_id=1126076389 instance=ExtResource("4_house")]
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -6, 0, 30.7)
+body_color = Color(0.62, 0.78, 0.52, 1)
+roof_color = Color(0.34, 0.46, 0.22, 1)
+house_label = "139"
+
+[node name="Mailbox139" parent="." unique_id=1879520740 instance=ExtResource("5_mailbox")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0, 29.9)
+house_id = "house_139"
+house_label = "139"
+
+[node name="House140" parent="." unique_id=495433008 instance=ExtResource("4_house")]
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -5.8, 0, 20)
+body_color = Color(0.96, 0.92, 0.78, 1)
+roof_color = Color(0.32, 0.48, 0.68, 1)
+house_label = "140"
+
+[node name="Mailbox140" parent="." unique_id=376219550 instance=ExtResource("5_mailbox")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 19.3)
+house_id = "house_140"
+house_label = "140"
+
+[node name="House141" parent="." unique_id=1539277968 instance=ExtResource("4_house")]
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -6.2, 0, 9.2)
+body_color = Color(0.32, 0.56, 0.78, 1)
+roof_color = Color(0.18, 0.3, 0.48, 1)
+house_label = "141"
+
+[node name="Mailbox141" parent="." unique_id=806150054 instance=ExtResource("5_mailbox")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 0, 9.5)
+house_id = "house_141"
+house_label = "141"
+
+[node name="House142" parent="." unique_id=2005612735 instance=ExtResource("4_house")]
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -5.9, 0, -0.8)
+body_color = Color(0.86, 0.32, 0.28, 1)
+roof_color = Color(0.54, 0.18, 0.14, 1)
+house_label = "142"
+
+[node name="Mailbox142" parent="." unique_id=1150505218 instance=ExtResource("5_mailbox")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.3)
+house_id = "house_142"
+house_label = "142"
+
+[node name="House143" parent="." unique_id=1236988742 instance=ExtResource("4_house")]
+transform = Transform3D(0, 0, -1.3, 0, 1.3, 0, 1.3, 0, 0, -6.3, 0, -11)
+body_color = Color(0.62, 0.6, 0.56, 1)
+roof_color = Color(0.36, 0.34, 0.32, 1)
+house_label = "143"
+
+[node name="Mailbox143" parent="." unique_id=2056488892 instance=ExtResource("5_mailbox")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0, -10.5)
+house_id = "house_143"
+house_label = "143"
+
+[node name="SignNorth" type="Node3D" parent="." unique_id=289514695]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 46.2)
+
+[node name="SignNorthPost" type="MeshInstance3D" parent="SignNorth" unique_id=1867195807]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("BoxMesh_sign_post")
+surface_material_override/0 = SubResource("Material_sign_post")
+
+[node name="SignNorthBoard" type="MeshInstance3D" parent="SignNorth" unique_id=823545051]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+mesh = SubResource("BoxMesh_street_board")
+surface_material_override/0 = SubResource("Material_street_board")
+
+[node name="SignNorthText" type="Label3D" parent="SignNorth" unique_id=493305014]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.07, 1.9, 0)
+pixel_size = 0.0055
+modulate = Color(0.96, 0.94, 0.86, 1)
+outline_modulate = Color(0.12, 0.22, 0.42, 1)
+text = "JUNIPER CRES"
+font_size = 48
+outline_size = 6
+
+[node name="SignSouth" type="Node3D" parent="." unique_id=396307605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, -15.8)
+
+[node name="SignSouthPost" type="MeshInstance3D" parent="SignSouth" unique_id=152559674]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("BoxMesh_sign_post")
+surface_material_override/0 = SubResource("Material_sign_post")
+
+[node name="SignSouthBoard" type="MeshInstance3D" parent="SignSouth" unique_id=1508712246]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+mesh = SubResource("BoxMesh_street_board")
+surface_material_override/0 = SubResource("Material_street_board")
+
+[node name="SignSouthText" type="Label3D" parent="SignSouth" unique_id=1700297004]
+transform = Transform3D(0, 0, 1, 0, 1, 0, -1, 0, 0, 0.07, 1.9, 0)
+pixel_size = 0.0055
+modulate = Color(0.96, 0.94, 0.86, 1)
+outline_modulate = Color(0.12, 0.22, 0.42, 1)
+text = "JUNIPER CRES"
+font_size = 48
+outline_size = 6
+
+[node name="Lamp1" type="OmniLight3D" parent="." unique_id=78917063]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 3.5, 34.7)
+light_color = Color(1, 0.78, 0.45, 1)
+light_energy = 0.8
+omni_range = 6.0
+
+[node name="Lamp2" type="OmniLight3D" parent="." unique_id=1324564351]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 3.5, 14.7)
+light_color = Color(1, 0.78, 0.45, 1)
+light_energy = 0.8
+omni_range = 6.0
+
+[node name="Lamp3" type="OmniLight3D" parent="." unique_id=304210346]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 3.5, -5.3)
+light_color = Color(1, 0.78, 0.45, 1)
+light_energy = 0.8
+omni_range = 6.0
+
+[node name="Leaves" type="Node3D" parent="." unique_id=1560178000]
+
+[node name="Leaf01" type="MeshInstance3D" parent="Leaves" unique_id=390671519]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.1, 46.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_red")
+
+[node name="Leaf02" type="MeshInstance3D" parent="Leaves" unique_id=1582764122]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.1, 43.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_orange")
+
+[node name="Leaf03" type="MeshInstance3D" parent="Leaves" unique_id=1483799154]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 0.1, 38.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_yellow")
+
+[node name="Leaf04" type="MeshInstance3D" parent="Leaves" unique_id=1853485946]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.2, 0.1, 34.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_red")
+
+[node name="Leaf05" type="MeshInstance3D" parent="Leaves" unique_id=2005164494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 0.1, 31.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_orange")
+
+[node name="Leaf06" type="MeshInstance3D" parent="Leaves" unique_id=757536758]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0.1, 27.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_yellow")
+
+[node name="Leaf07" type="MeshInstance3D" parent="Leaves" unique_id=1790120689]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 0.1, 23.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_red")
+
+[node name="Leaf08" type="MeshInstance3D" parent="Leaves" unique_id=1999396556]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 0.1, 18.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_orange")
+
+[node name="Leaf09" type="MeshInstance3D" parent="Leaves" unique_id=1311499089]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.1, 13.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_yellow")
+
+[node name="Leaf10" type="MeshInstance3D" parent="Leaves" unique_id=607556820]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.1, 8.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_red")
+
+[node name="Leaf11" type="MeshInstance3D" parent="Leaves" unique_id=796932556]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0.1, 3.2)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_orange")
+
+[node name="Leaf12" type="MeshInstance3D" parent="Leaves" unique_id=86413418]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.4, 0.1, -2.8)
+mesh = SubResource("BoxMesh_leaf")
+surface_material_override/0 = SubResource("Material_leaf_yellow")
+
+[node name="Tiles" type="Node3D" parent="." unique_id=1467409460]
+
+[node name="Tile01" type="MeshInstance3D" parent="Tiles" unique_id=1711671330]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 46.2)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_a")
+
+[node name="Tile02" type="MeshInstance3D" parent="Tiles" unique_id=1639576014]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 44.6)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_b")
+
+[node name="Tile03" type="MeshInstance3D" parent="Tiles" unique_id=1352044844]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 43)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_c")
+
+[node name="Tile04" type="MeshInstance3D" parent="Tiles" unique_id=252784481]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 41.4)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_a")
+
+[node name="Tile05" type="MeshInstance3D" parent="Tiles" unique_id=1705744658]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 39.8)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_b")
+
+[node name="Tile06" type="MeshInstance3D" parent="Tiles" unique_id=1073565115]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 38.2)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_c")
+
+[node name="Tile07" type="MeshInstance3D" parent="Tiles" unique_id=837602596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 36.6)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_a")
+
+[node name="Tile08" type="MeshInstance3D" parent="Tiles" unique_id=1725142139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 35)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_b")
+
+[node name="Tile09" type="MeshInstance3D" parent="Tiles" unique_id=271082779]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 33.4)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_c")
+
+[node name="Tile10" type="MeshInstance3D" parent="Tiles" unique_id=1740217206]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 31.8)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_a")
+
+[node name="Tile11" type="MeshInstance3D" parent="Tiles" unique_id=1133020353]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 30.2)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_b")
+
+[node name="Tile12" type="MeshInstance3D" parent="Tiles" unique_id=1141363346]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4, 0.04, 28.6)
+mesh = SubResource("BoxMesh_tile")
+surface_material_override/0 = SubResource("Material_tile_c")
+
+[node name="Gossip" parent="." unique_id=642187161 instance=ExtResource("10_gossip")]
+transform = Transform3D(-0.9063, 0, 0.4226, 0, 1, 0, -0.4226, 0, -0.9063, 0.3, 0, 43.2)
+speaker_name = "Ms. Day"
+intro_lines = ["Oh — hello! You must be our new mail carrier. I'm Mindy Day, I live in the red house down the way.", "Some of the places along here can be a bit boring, but Ms. Owens at least puts in the effort. Bless her.", "Wish Mr. Gray would too — his house is an absolute eyesore, and it's right next door to mine.", "Anyway, I'll let you get on with it. My kids are playing out front if you need a smile along the way."]
+portrait_skin = Color(0.93, 0.78, 0.62, 1)
+portrait_body = Color(0.28, 0.48, 0.52, 1)
+portrait_cap = Color(0.42, 0.28, 0.18, 1)
+
+[node name="Legs" parent="Gossip" index="1" unique_id=330533431]
+surface_material_override/0 = SubResource("Material_msday_pants")
+
+[node name="Body" parent="Gossip" index="2" unique_id=1014960780]
+surface_material_override/0 = SubResource("Material_msday_dress")
+
+[node name="Head" parent="Gossip" index="3" unique_id=1967287799]
+surface_material_override/0 = SubResource("Material_msday_skin")
+
+[node name="Hair" type="MeshInstance3D" parent="Gossip" unique_id=1257431075]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.47, 0)
+mesh = SubResource("BoxMesh_msday_hair")
+surface_material_override/0 = SubResource("Material_msday_hair")
+
+[node name="Player" parent="." unique_id=1933858048 instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 44.2)
+
+[node name="HUD" parent="." unique_id=2075584406 instance=ExtResource("3_hud")]
+
+[editable path="Gossip"]
