@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://1slfugitpc20"]
 
-[ext_resource type="Script" uid="uid://v7jfaqelwwf1" path="res://scripts/game/level.gd" id="1_level"]
+[ext_resource type="Script" uid="uid://v7jfaqelwwf1" path="res://scripts/game/neighborhood_05.gd" id="1_level"]
 [ext_resource type="PackedScene" uid="uid://choy2q1kv47l2" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://b1mailman1hud" path="res://scenes/ui/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://dubcydii5iy53" path="res://scenes/houses/house.tscn" id="4_house"]

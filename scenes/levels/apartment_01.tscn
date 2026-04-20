@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://c5apt01sdaf5"]
 
-[ext_resource type="Script" uid="uid://c5aplvl3n8j5" path="res://scripts/game/apartment_level.gd" id="1_aplevel"]
+[ext_resource type="Script" uid="uid://c5aplvl3n8j5" path="res://scripts/game/apartment_01.gd" id="1_aplevel"]
 [ext_resource type="PackedScene" uid="uid://choy2q1kv47l2" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://b1mailman1hud" path="res://scenes/ui/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://c5aptscdr806" path="res://scenes/interactables/apartment_door.tscn" id="4_door"]
 [ext_resource type="PackedScene" uid="uid://c5elvsc7k2qa" path="res://scenes/interactables/elevator.tscn" id="5_elevator"]
+[ext_resource type="PackedScene" uid="uid://bdp15q37wljtl" path="res://scenes/interactables/gossip.tscn" id="6_gossip"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
 sky_top_color = Color(0.42, 0.72, 0.96, 1)
@@ -58,6 +59,42 @@ size = Vector3(1.0, 11.0, 1.0)
 [sub_resource type="StandardMaterial3D" id="Material_shaft"]
 albedo_color = Color(0.2, 0.6, 0.58, 1)
 roughness = 0.8
+
+[sub_resource type="SphereMesh" id="SphereMesh_note_head"]
+radius = 0.09
+height = 0.16
+radial_segments = 10
+rings = 5
+
+[sub_resource type="BoxMesh" id="BoxMesh_note_stem"]
+size = Vector3(0.025, 0.36, 0.025)
+
+[sub_resource type="BoxMesh" id="BoxMesh_note_flag"]
+size = Vector3(0.02, 0.08, 0.14)
+
+[sub_resource type="StandardMaterial3D" id="Material_note"]
+albedo_color = Color(0.16, 0.14, 0.18, 1)
+roughness = 0.55
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_nest"]
+top_radius = 0.24
+bottom_radius = 0.18
+height = 0.16
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="Material_nest"]
+albedo_color = Color(0.42, 0.28, 0.16, 1)
+roughness = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_egg"]
+radius = 0.055
+height = 0.08
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="Material_egg"]
+albedo_color = Color(0.82, 0.92, 0.84, 1)
+roughness = 0.65
 
 [node name="Apartment01" type="Node3D" unique_id=1001]
 script = ExtResource("1_aplevel")
@@ -210,6 +247,77 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 4, -7)
 
 [node name="Elevator3" parent="." unique_id=1037 instance=ExtResource("5_elevator")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 8, -7)
+
+[node name="MusicalNotes303" type="Node3D" parent="." unique_id=1040]
+
+[node name="Note1Head" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1041]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 10.35, 2.55)
+mesh = SubResource("SphereMesh_note_head")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note1Stem" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1042]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 10.53, 2.55)
+mesh = SubResource("BoxMesh_note_stem")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note1Flag" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1043]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 10.69, 2.62)
+mesh = SubResource("BoxMesh_note_flag")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note2Head" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 10.85, 2.0)
+mesh = SubResource("SphereMesh_note_head")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note2Stem" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1045]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39, 11.03, 2.0)
+mesh = SubResource("BoxMesh_note_stem")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note3Head" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1046]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 11.25, 1.55)
+mesh = SubResource("SphereMesh_note_head")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note3Stem" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1047]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, 11.43, 1.55)
+mesh = SubResource("BoxMesh_note_stem")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note3Flag" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, 11.59, 1.62)
+mesh = SubResource("BoxMesh_note_flag")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="BirdNest203" type="Node3D" parent="." unique_id=1049]
+
+[node name="NestBase" type="MeshInstance3D" parent="BirdNest203" unique_id=1050]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 4.08, 2.75)
+mesh = SubResource("CylinderMesh_nest")
+surface_material_override/0 = SubResource("Material_nest")
+
+[node name="Egg1" type="MeshInstance3D" parent="BirdNest203" unique_id=1051]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36, 4.2, 2.7)
+mesh = SubResource("SphereMesh_egg")
+surface_material_override/0 = SubResource("Material_egg")
+
+[node name="Egg2" type="MeshInstance3D" parent="BirdNest203" unique_id=1052]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 4.2, 2.78)
+mesh = SubResource("SphereMesh_egg")
+surface_material_override/0 = SubResource("Material_egg")
+
+[node name="Egg3" type="MeshInstance3D" parent="BirdNest203" unique_id=1053]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 4.2, 2.82)
+mesh = SubResource("SphereMesh_egg")
+surface_material_override/0 = SubResource("Material_egg")
+
+[node name="Martha" parent="." unique_id=1054 instance=ExtResource("6_gossip")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0.4, 0, 0.6)
+speaker_name = "Martha"
+intro_lines = ["Oh, a new postie! Name's Martha. Twenty-six years in this complex now — and let me tell you, twenty-six years too long.", "Pipes rattle, the elevator groans, walls thin as paper. Pure neglect, that's what it is.", "And the noise! There's a man on my floor — top floor — bangs on his piano at all hours. Wakes the two floors below us right out of bed.", "Mind you, the landlord lives here too. Tucked away on the first floor, far enough that none of the racket reaches him. Awfully convenient, isn't it?", "Anyhow, I must run — came down to visit my dear friend Anne. She's just over to the left there, all on her own. Welcome to 131 Gomorda Drive, dear!"]
+portrait_skin = Color(0.94, 0.78, 0.66, 1)
+portrait_body = Color(0.62, 0.28, 0.4, 1)
 
 [node name="Player" parent="." unique_id=1038 instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 3)
