@@ -4,7 +4,7 @@ extends Node3D
 ## then a simple "read the address, pick the matching mailbox" exercise.
 ## Finishing this level advances the player to the longer Elmwood tutorial.
 
-@export var next_level_path: String = "res://scenes/levels/neighborhood_04.tscn"
+@export var next_level_path: String = "res://scenes/levels/neighborhood/neighborhood_04/neighborhood_04.tscn"
 
 @onready var player:      CharacterBody3D = $Player
 @onready var hud:         CanvasLayer     = $HUD

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c5apt01sdaf5"]
 
-[ext_resource type="Script" uid="uid://c5aplvl3n8j5" path="res://scripts/game/apartment_01.gd" id="1_aplevel"]
+[ext_resource type="Script" uid="uid://c5aplvl3n8j5" path="res://scenes/levels/apartment/apartment_01/apartment_01.gd" id="1_aplevel"]
 [ext_resource type="PackedScene" uid="uid://choy2q1kv47l2" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" uid="uid://b1mailman1hud" path="res://scenes/ui/hud.tscn" id="3_hud"]
 [ext_resource type="PackedScene" uid="uid://c5aptscdr806" path="res://scenes/interactables/apartment_door.tscn" id="4_door"]
