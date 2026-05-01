@@ -1,17 +1,19 @@
 extends RefCounted
 class_name SortingMode
-## Experiment: 2D drag-and-drop sorting mode (Papers Please style).
-## Flip FLAG to "sideScroller3D" to restore the original 3D-rendered
-## side-scroller. Nothing else needs to change — the bootstrap scene
-## picks the right path on startup.
+## Mode constants shared by the start screen, the F1/F2 hotkey autoload, and
+## the legacy bootstrap scene. The start screen is the durable entry point;
+## FLAG remains as a fallback when the bootstrap scene is run directly.
 ##
 ## This is a pure-constants helper; nothing here mutates global state.
 
 const MODE_SIDE_SCROLLER_3D := "sideScroller3D"
 const MODE_SORTING_DESK_2D  := "sortingDesk2D"
 
-## Active game mode. Change this one string to A/B test the experiment.
+## Default mode used by the legacy bootstrap scene when launched directly.
 const FLAG: String = MODE_SIDE_SCROLLER_3D
+
+## Title screen — the project's main_scene.
+const START_SCREEN_SCENE := "res://scenes/ui/start_screen.tscn"
 
 ## Existing 3D entry point — the prior project.godot run/main_scene.
 const SIDE_SCROLLER_ENTRY := "res://scenes/levels/neighborhood/neighborhood_00_01/neighborhood_00_01.tscn"
