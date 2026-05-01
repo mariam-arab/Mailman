@@ -15,4 +15,4 @@ func _on_side_scroller_pressed() -> void:
 
 
 func _on_sorting_pressed() -> void:
-	get_tree().change_scene_to_file(SortingMode.SORTING_DESK_SCENE)
+	get_tree().change_scene_to_file(SortingMode.SORTING_LEVEL_SELECT_SCENE)

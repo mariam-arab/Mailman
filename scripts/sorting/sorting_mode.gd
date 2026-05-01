@@ -18,6 +18,14 @@ const START_SCREEN_SCENE := "res://scenes/ui/start_screen.tscn"
 ## Level selector for the side-scroller mode (lists the two worlds).
 const LEVEL_SELECT_SCENE := "res://scenes/ui/level_select.tscn"
 
+## Level selector for the 2D sorting mode (Neighborhood only — see
+## level_select.gd for why Apartment is excluded).
+const SORTING_LEVEL_SELECT_SCENE := "res://scenes/ui/sorting_level_select.tscn"
+
+## Set by the sorting level selector before changing scene; consumed once by
+## the sorting desk on startup. Empty string means "use the default level".
+static var pending_level_path: String = ""
+
 ## Existing 3D entry point — the prior project.godot run/main_scene.
 const SIDE_SCROLLER_ENTRY := "res://scenes/levels/neighborhood/neighborhood_00_01/neighborhood_00_01.tscn"
 
