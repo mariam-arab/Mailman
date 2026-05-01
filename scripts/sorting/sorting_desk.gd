@@ -55,7 +55,22 @@ func _ready() -> void:
 	_build_drag_layer()
 	_build_hud_layer()
 	_build_summary()
+	_consume_pending_level()
 	_load_level(_level_index)
+
+
+## If the sorting level selector stashed a chosen level on SortingMode,
+## convert it to an index into SORTING_LEVEL_PATHS and clear the stash.
+## A stash that doesn't match any pool entry is ignored — the desk falls
+## back to the default level rather than crashing.
+func _consume_pending_level() -> void:
+	var pending: String = SortingMode.pending_level_path
+	if pending.is_empty():
+		return
+	SortingMode.pending_level_path = ""
+	var idx := SortingMode.SORTING_LEVEL_PATHS.find(pending)
+	if idx >= 0:
+		_level_index = idx
 
 
 # ─────────────────────────────────────────────────────────────────────────────
