@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameState="*res://scripts/game/game_state.gd"
+SortingHotkey="*res://scripts/sorting/sorting_hotkey.gd"
 
 [display]
 
