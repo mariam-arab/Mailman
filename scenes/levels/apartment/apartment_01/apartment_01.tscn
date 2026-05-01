@@ -1,0 +1,325 @@
+[gd_scene format=3 uid="uid://c5apt01sdaf5"]
+
+[ext_resource type="Script" uid="uid://c5aplvl3n8j5" path="res://scenes/levels/apartment/apartment_01/apartment_01.gd" id="1_apartment"]
+[ext_resource type="PackedScene" uid="uid://choy2q1kv47l2" path="res://scenes/player/player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://b1mailman1hud" path="res://scenes/ui/hud.tscn" id="3_hud"]
+[ext_resource type="PackedScene" uid="uid://c5aptscdr806" path="res://scenes/interactables/apartment_door.tscn" id="4_door"]
+[ext_resource type="PackedScene" uid="uid://c5elvsc7k2qa" path="res://scenes/interactables/elevator.tscn" id="5_elevator"]
+[ext_resource type="PackedScene" uid="uid://bdp15q37wljtl" path="res://scenes/interactables/gossip.tscn" id="6_gossip"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_sky"]
+sky_top_color = Color(0.42, 0.72, 0.96, 1)
+sky_horizon_color = Color(0.72, 0.9, 0.98, 1)
+ground_bottom_color = Color(0.5, 0.48, 0.4, 1)
+ground_horizon_color = Color(0.72, 0.78, 0.68, 1)
+sun_angle_max = 60.0
+sun_curve = 0.25
+
+[sub_resource type="Sky" id="Sky_paper"]
+sky_material = SubResource("ProceduralSkyMaterial_sky")
+
+[sub_resource type="Environment" id="Environment_paper"]
+background_mode = 2
+sky = SubResource("Sky_paper")
+ambient_light_source = 3
+ambient_light_color = Color(0.96, 0.94, 0.88, 1)
+ambient_light_sky_contribution = 0.4
+ambient_light_energy = 1.05
+tonemap_mode = 3
+tonemap_exposure = 1.15
+tonemap_white = 6.0
+glow_enabled = true
+glow_intensity = 0.35
+glow_strength = 1.05
+glow_bloom = 0.05
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(14, 0.4, 14)
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(14, 0.4, 14)
+
+[sub_resource type="StandardMaterial3D" id="Material_floor"]
+albedo_color = Color(0.88, 0.82, 0.72, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_backwall"]
+size = Vector3(0.2, 12.0, 14.0)
+
+[sub_resource type="StandardMaterial3D" id="Material_wall"]
+albedo_color = Color(0.88, 0.85, 0.78, 1)
+roughness = 1.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_edge"]
+size = Vector3(14.0, 3.2, 0.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_shaft"]
+size = Vector3(1.0, 11.0, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="Material_shaft"]
+albedo_color = Color(0.2, 0.6, 0.58, 1)
+roughness = 0.8
+
+[sub_resource type="SphereMesh" id="SphereMesh_note_head"]
+radius = 0.09
+height = 0.16
+radial_segments = 10
+rings = 5
+
+[sub_resource type="BoxMesh" id="BoxMesh_note_stem"]
+size = Vector3(0.025, 0.36, 0.025)
+
+[sub_resource type="BoxMesh" id="BoxMesh_note_flag"]
+size = Vector3(0.02, 0.08, 0.14)
+
+[sub_resource type="StandardMaterial3D" id="Material_note"]
+albedo_color = Color(0.16, 0.14, 0.18, 1)
+roughness = 0.55
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_nest"]
+top_radius = 0.24
+bottom_radius = 0.18
+height = 0.16
+radial_segments = 12
+
+[sub_resource type="StandardMaterial3D" id="Material_nest"]
+albedo_color = Color(0.42, 0.28, 0.16, 1)
+roughness = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_egg"]
+radius = 0.055
+height = 0.08
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="Material_egg"]
+albedo_color = Color(0.82, 0.92, 0.84, 1)
+roughness = 0.65
+
+[node name="Apartment01" type="Node3D" unique_id=1001]
+script = ExtResource("1_apartment")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1002]
+environment = SubResource("Environment_paper")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1003]
+transform = Transform3D(0.866025, 0.353553, -0.353553, 0, 0.707107, 0.707107, 0.5, -0.612372, 0.612372, 0, 12, 30.2)
+light_color = Color(1, 0.92, 0.78, 1)
+light_energy = 1.5
+shadow_enabled = true
+directional_shadow_max_distance = 80.0
+
+[node name="SideCamera" type="Camera3D" parent="." unique_id=1004]
+transform = Transform3D(0, -0.407, 0.913, 0, 0.913, 0.407, -1, 0, 0, 10, 3.0, 3)
+current = true
+fov = 30.0
+near = 0.1
+far = 150.0
+
+[node name="Floors" type="Node3D" parent="." unique_id=1005]
+
+[node name="Floor1" type="StaticBody3D" parent="Floors" unique_id=1006]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floors/Floor1" unique_id=1007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -0.2, -3)
+shape = SubResource("BoxShape3D_floor")
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floors/Floor1" unique_id=1008]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, -0.2, -3)
+mesh = SubResource("BoxMesh_floor")
+surface_material_override/0 = SubResource("Material_floor")
+
+[node name="Floor2" type="StaticBody3D" parent="Floors" unique_id=1009]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floors/Floor2" unique_id=1010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 3.8, -3)
+shape = SubResource("BoxShape3D_floor")
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floors/Floor2" unique_id=1011]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 3.8, -3)
+mesh = SubResource("BoxMesh_floor")
+surface_material_override/0 = SubResource("Material_floor")
+
+[node name="Floor3" type="StaticBody3D" parent="Floors" unique_id=1012]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floors/Floor3" unique_id=1013]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 7.8, -3)
+shape = SubResource("BoxShape3D_floor")
+
+[node name="FloorMesh" type="MeshInstance3D" parent="Floors/Floor3" unique_id=1014]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 7.8, -3)
+mesh = SubResource("BoxMesh_floor")
+surface_material_override/0 = SubResource("Material_floor")
+
+[node name="BackWall" type="MeshInstance3D" parent="." unique_id=1015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.4, 6.0, -3)
+mesh = SubResource("BoxMesh_backwall")
+surface_material_override/0 = SubResource("Material_wall")
+
+[node name="ElevatorShaft" type="MeshInstance3D" parent="." unique_id=1016]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 5.5, -7)
+mesh = SubResource("BoxMesh_shaft")
+surface_material_override/0 = SubResource("Material_shaft")
+
+[node name="EdgeWalls" type="Node3D" parent="." unique_id=1017]
+
+[node name="EdgeWall2N" type="StaticBody3D" parent="EdgeWalls" unique_id=1018]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EdgeWalls/EdgeWall2N" unique_id=1019]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 5.5, -10.2)
+shape = SubResource("BoxShape3D_edge")
+
+[node name="EdgeWall2S" type="StaticBody3D" parent="EdgeWalls" unique_id=1020]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EdgeWalls/EdgeWall2S" unique_id=1021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 5.5, 4.2)
+shape = SubResource("BoxShape3D_edge")
+
+[node name="EdgeWall3N" type="StaticBody3D" parent="EdgeWalls" unique_id=1022]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EdgeWalls/EdgeWall3N" unique_id=1023]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 9.5, -10.2)
+shape = SubResource("BoxShape3D_edge")
+
+[node name="EdgeWall3S" type="StaticBody3D" parent="EdgeWalls" unique_id=1024]
+collision_layer = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EdgeWalls/EdgeWall3S" unique_id=1025]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 9.5, 4.2)
+shape = SubResource("BoxShape3D_edge")
+
+[node name="Door101" parent="." unique_id=1026 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -4)
+house_id = "apt_101"
+house_label = "101"
+
+[node name="Door102" parent="." unique_id=1027 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -1)
+house_id = "apt_102"
+house_label = "102"
+
+[node name="Door103" parent="." unique_id=1028 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 2)
+house_id = "apt_103"
+house_label = "103"
+
+[node name="Door201" parent="." unique_id=1029 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 4, -4)
+house_id = "apt_201"
+house_label = "201"
+
+[node name="Door202" parent="." unique_id=1030 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 4, -1)
+house_id = "apt_202"
+house_label = "202"
+
+[node name="Door203" parent="." unique_id=1031 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 4, 2)
+house_id = "apt_203"
+house_label = "203"
+
+[node name="Door301" parent="." unique_id=1032 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 8, -4)
+house_id = "apt_301"
+house_label = "301"
+
+[node name="Door302" parent="." unique_id=1033 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 8, -1)
+house_id = "apt_302"
+house_label = "302"
+
+[node name="Door303" parent="." unique_id=1034 instance=ExtResource("4_door")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 8, 2)
+house_id = "apt_303"
+house_label = "303"
+
+[node name="Elevator1" parent="." unique_id=1035 instance=ExtResource("5_elevator")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -7)
+
+[node name="Elevator2" parent="." unique_id=1036 instance=ExtResource("5_elevator")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 4, -7)
+
+[node name="Elevator3" parent="." unique_id=1037 instance=ExtResource("5_elevator")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 8, -7)
+
+[node name="MusicalNotes303" type="Node3D" parent="." unique_id=1040]
+
+[node name="Note1Head" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1041]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 10.35, 2.55)
+mesh = SubResource("SphereMesh_note_head")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note1Stem" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1042]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 10.53, 2.55)
+mesh = SubResource("BoxMesh_note_stem")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note1Flag" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1043]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 10.69, 2.62)
+mesh = SubResource("BoxMesh_note_flag")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note2Head" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.32, 10.85, 2.0)
+mesh = SubResource("SphereMesh_note_head")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note2Stem" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1045]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.39, 11.03, 2.0)
+mesh = SubResource("BoxMesh_note_stem")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note3Head" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1046]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 11.25, 1.55)
+mesh = SubResource("SphereMesh_note_head")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note3Stem" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1047]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, 11.43, 1.55)
+mesh = SubResource("BoxMesh_note_stem")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="Note3Flag" type="MeshInstance3D" parent="MusicalNotes303" unique_id=1048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.27, 11.59, 1.62)
+mesh = SubResource("BoxMesh_note_flag")
+surface_material_override/0 = SubResource("Material_note")
+
+[node name="BirdNest203" type="Node3D" parent="." unique_id=1049]
+
+[node name="NestBase" type="MeshInstance3D" parent="BirdNest203" unique_id=1050]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 4.08, 2.75)
+mesh = SubResource("CylinderMesh_nest")
+surface_material_override/0 = SubResource("Material_nest")
+
+[node name="Egg1" type="MeshInstance3D" parent="BirdNest203" unique_id=1051]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.36, 4.2, 2.7)
+mesh = SubResource("SphereMesh_egg")
+surface_material_override/0 = SubResource("Material_egg")
+
+[node name="Egg2" type="MeshInstance3D" parent="BirdNest203" unique_id=1052]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24, 4.2, 2.78)
+mesh = SubResource("SphereMesh_egg")
+surface_material_override/0 = SubResource("Material_egg")
+
+[node name="Egg3" type="MeshInstance3D" parent="BirdNest203" unique_id=1053]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.3, 4.2, 2.82)
+mesh = SubResource("SphereMesh_egg")
+surface_material_override/0 = SubResource("Material_egg")
+
+[node name="Martha" parent="." unique_id=1054 instance=ExtResource("6_gossip")]
+transform = Transform3D(0, 0, -1, 0, 1, 0, 1, 0, 0, 0.4, 0, 0.6)
+speaker_name = "Martha"
+intro_lines = ["Oh, a new postie! Name's Martha. Twenty-six years in this complex now — and let me tell you, twenty-six years too long.", "Pipes rattle, the elevator groans, walls thin as paper. Pure neglect, that's what it is.", "And the noise! There's a man on my floor — top floor — bangs on his piano at all hours. Wakes the two floors below us right out of bed.", "Mind you, the landlord lives here too. Tucked away on the first floor, far enough that none of the racket reaches him. Awfully convenient, isn't it?", "Anyhow, I must run — came down to visit my dear friend Anne. She's just over to the left there, all on her own. Welcome to 131 Gomorda Drive, dear!"]
+portrait_skin = Color(0.94, 0.78, 0.66, 1)
+portrait_body = Color(0.62, 0.28, 0.4, 1)
+
+[node name="Player" parent="." unique_id=1038 instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 3)
+
+[node name="HUD" parent="." unique_id=1039 instance=ExtResource("3_hud")]

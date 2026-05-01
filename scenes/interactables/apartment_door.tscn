@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://c5aptscdr806"]
+
+[ext_resource type="Script" uid="uid://c5aptdr8z6f3" path="res://scripts/interactables/apartment_door.gd" id="1_door"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_door"]
+size = Vector3(0.5, 2.0, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="Material_wood"]
+albedo_color = Color(0.55, 0.3, 0.14, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="Material_plate"]
+albedo_color = Color(0.96, 0.91, 0.78, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_door"]
+size = Vector3(0.08, 2.0, 0.9)
+
+[sub_resource type="BoxMesh" id="BoxMesh_plate"]
+size = Vector3(0.04, 0.22, 0.38)
+
+[sub_resource type="SphereMesh" id="SphereMesh_knob"]
+radius = 0.045
+height = 0.09
+radial_segments = 8
+rings = 4
+
+[sub_resource type="StandardMaterial3D" id="Material_knob"]
+albedo_color = Color(0.91, 0.76, 0.28, 1)
+metallic = 0.8
+roughness = 0.3
+
+[node name="ApartmentDoor" type="StaticBody3D"]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("1_door")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2002]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+shape = SubResource("BoxShape3D_door")
+
+[node name="DoorMesh" type="MeshInstance3D" parent="." unique_id=2003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+mesh = SubResource("BoxMesh_door")
+surface_material_override/0 = SubResource("Material_wood")
+
+[node name="Plate" type="MeshInstance3D" parent="." unique_id=2004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.06, 2.18, 0)
+mesh = SubResource("BoxMesh_plate")
+surface_material_override/0 = SubResource("Material_plate")
+
+[node name="Knob" type="MeshInstance3D" parent="." unique_id=2005]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.085, 1.0, 0.32)
+mesh = SubResource("SphereMesh_knob")
+surface_material_override/0 = SubResource("Material_knob")
+
+[node name="Label" type="Label3D" parent="." unique_id=2006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 2.18, 0)
+pixel_size = 0.006
+font_size = 28
+text = "???"
+modulate = Color(0.25, 0.15, 0.06, 1)
+billboard = 1

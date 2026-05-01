@@ -20,6 +20,8 @@ extends CharacterBody3D
 
 @onready var interact_range: Area3D = $InteractRange
 
+var _input_active: bool = true
+
 
 func _ready() -> void:
 	# Don't capture the mouse in side-scroll mode — there's nothing to aim.
@@ -31,14 +33,18 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= ProjectSettings.get_setting("physics/3d/default_gravity") * delta
 
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		velocity.y = jump_velocity
+	if _input_active:
+		if Input.is_action_just_pressed("jump") and is_on_floor():
+			velocity.y = jump_velocity
 
-	# Map left/right inputs to motion along the world's Z axis. Right (+X
-	# screen-space) maps to -Z because the camera looks down -X — pressing
-	# right should move the player to screen-right regardless of axis polarity.
-	var axis := Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
-	velocity.z = -axis * walk_speed
+		# Map left/right inputs to motion along the world's Z axis. Right (+X
+		# screen-space) maps to -Z because the camera looks down -X — pressing
+		# right should move the player to screen-right regardless of axis polarity.
+		var axis := Input.get_action_strength("move_right") - Input.get_action_strength("move_left")
+		velocity.z = -axis * walk_speed
+	else:
+		velocity.z = 0.0
+
 	# X is locked. We zero it instead of letting drift accumulate.
 	velocity.x = 0.0
 
@@ -48,23 +54,24 @@ func _physics_process(delta: float) -> void:
 		global_position.x = locked_x
 
 
-## Returns the closest InteractableObject currently inside the player's
-## interact range, or null if nothing is in reach. Used by the level script to
-## drive the HUD prompt and route E presses.
+## Returns the closest enabled InteractableObject within INTERACT_RANGE units.
+## Uses a group scan instead of Area3D so it works regardless of physics-layer
+## timing or collision-mask mismatches.
+const INTERACT_RANGE := 2.5
 func closest_interactable():
 	var best = null
-	var best_dist := INF
-	for body in interact_range.get_overlapping_bodies():
-		if body is InteractableObject and body.enabled:
-			var d := global_position.distance_to(body.global_position)
-			if d < best_dist:
-				best = body
-				best_dist = d
+	var best_dist := INTERACT_RANGE
+	for node in get_tree().get_nodes_in_group("interactable"):
+		if not (node is InteractableObject) or not node.enabled:
+			continue
+		var d := global_position.distance_to(node.global_position)
+		if d < best_dist:
+			best = node
+			best_dist = d
 	return best
 
 
-## Compatibility shim for the HUD's mouse-release call. In 2D mode we don't
-## capture the mouse, so this is a no-op — the HUD calls it on inspection
-## open/close and on day-end, and we want the API to match the 3D version.
-func set_input_active(_active: bool) -> void:
-	pass
+## Called by the HUD when inspection opens/closes so A/D carousel keys don't
+## also move the player.
+func set_input_active(active: bool) -> void:
+	_input_active = active
