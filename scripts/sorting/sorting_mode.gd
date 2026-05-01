@@ -15,6 +15,9 @@ const FLAG: String = MODE_SIDE_SCROLLER_3D
 ## Title screen — the project's main_scene.
 const START_SCREEN_SCENE := "res://scenes/ui/start_screen.tscn"
 
+## Level selector for the side-scroller mode (lists the two worlds).
+const LEVEL_SELECT_SCENE := "res://scenes/ui/level_select.tscn"
+
 ## Existing 3D entry point — the prior project.godot run/main_scene.
 const SIDE_SCROLLER_ENTRY := "res://scenes/levels/neighborhood/neighborhood_00_01/neighborhood_00_01.tscn"
 

@@ -11,7 +11,7 @@ func _ready() -> void:
 
 
 func _on_side_scroller_pressed() -> void:
-	get_tree().change_scene_to_file(SortingMode.SIDE_SCROLLER_ENTRY)
+	get_tree().change_scene_to_file(SortingMode.LEVEL_SELECT_SCENE)
 
 
 func _on_sorting_pressed() -> void:
