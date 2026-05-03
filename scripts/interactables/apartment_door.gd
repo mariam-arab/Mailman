@@ -14,9 +14,7 @@ func _ready() -> void:
 
 
 func prompt_text() -> String:
-	if GameState.get_selected_letter() != null:
-		return "E: Deliver to %s" % house_label
-	return "E: Knock on %s" % house_label
+	return "Tab: open bag to deliver"
 
 
 func interact(player: Node) -> void:
