@@ -779,9 +779,9 @@ func _update_delivery_slots() -> void:
 	var prev_count := _slot_panels.size()
 
 	for node in get_tree().get_nodes_in_group("interactable"):
-		if not (node is Mailbox) or not node.enabled:
+		if not _is_delivery_target(node) or not node.enabled:
 			continue
-		var world_pos:  Vector3 = node.global_position + Vector3(0, 2.0, 0)
+		var world_pos:  Vector3 = node.global_position + _slot_offset(node)
 		var screen_pos: Vector2 = _camera.unproject_position(world_pos)
 
 		if vp.has_point(screen_pos):
@@ -865,31 +865,58 @@ func _update_slot_highlight(mouse_pos: Vector2) -> void:
 			sp.get_meta("sty_hot") if _hit(sp, mouse_pos) else sp.get_meta("sty_idle"))
 
 
-# -- house zone projection -----------------------------------------------------
+# -- delivery target dispatch --------------------------------------------------
 
-## Returns a screen-space Rect2 that covers the house belonging to `mailbox`.
-## We project 8 world-space corners of the house bounding box so the zone
-## automatically shrinks for far houses and grows for near ones (perspective).
-func _house_zone(mailbox: Node) -> Rect2:
+func _is_delivery_target(node: Node) -> bool:
+	return node is Mailbox or node is ApartmentDoor
+
+
+func _slot_offset(node: Node) -> Vector3:
+	# Where the floating slot panel sits relative to the target's origin.
+	# Mailboxes are short (~1.6m) so the slot floats just above the box top.
+	# Apartment doors are 2m tall with a label plate above — push the slot
+	# higher so it doesn't overlap the door itself.
+	if node is ApartmentDoor:
+		return Vector3(0, 2.8, 0)
+	return Vector3(0, 2.0, 0)
+
+
+# -- delivery zone projection --------------------------------------------------
+
+## Returns a screen-space Rect2 covering the drop target. We project 8
+## world-space corners of a per-target bbox so perspective shrinks distant
+## zones and adjacent targets don't overlap.
+func _house_zone(target: Node) -> Rect2:
 	if _camera == null:
 		return Rect2()
-	# House bbox in world-space relative to the mailbox origin.
-	# Houses sit ~6 units behind (in -X) the mailbox, are ~7.5 units tall,
-	# and ~3.5 units wide (in Z).  Scale 1.3 is already baked into world coords.
-	const X_NEAR :=  0.5    # just past mailbox towards camera
-	const X_FAR  := -9.0    # back wall of house
-	const Y_TOP  :=  6.5    # chimney top
-	const Z_HALF :=  2.0    # half street-width (house body is ±2.86 but trim to body face)
-	var mb: Vector3 = (mailbox as Node3D).global_position
+
+	# Local bbox extents relative to the target's origin.
+	# Mailboxes use the larger house behind them (camera looks along -X, so
+	# the house extends backwards in -X). Doors use a tight bbox sized to the
+	# door panel itself so drops don't bleed onto adjacent units (apartment
+	# doors are spaced 3m apart on Z, 4m apart on Y).
+	var x_near: float; var x_far: float
+	var y_top:  float
+	var z_half: float
+	if target is ApartmentDoor:
+		x_near =  1.0; x_far = -1.0
+		y_top  =  3.0
+		z_half =  1.2
+	else:
+		x_near =  0.5; x_far = -9.0
+		y_top  =  6.5
+		z_half =  2.0
+
+	var origin: Vector3 = (target as Node3D).global_position
 	var corners := [
-		mb + Vector3(X_NEAR, 0.0,   -Z_HALF),
-		mb + Vector3(X_NEAR, 0.0,    Z_HALF),
-		mb + Vector3(X_FAR,  0.0,   -Z_HALF),
-		mb + Vector3(X_FAR,  0.0,    Z_HALF),
-		mb + Vector3(X_NEAR, Y_TOP, -Z_HALF),
-		mb + Vector3(X_NEAR, Y_TOP,  Z_HALF),
-		mb + Vector3(X_FAR,  Y_TOP, -Z_HALF),
-		mb + Vector3(X_FAR,  Y_TOP,  Z_HALF),
+		origin + Vector3(x_near, 0.0,   -z_half),
+		origin + Vector3(x_near, 0.0,    z_half),
+		origin + Vector3(x_far,  0.0,   -z_half),
+		origin + Vector3(x_far,  0.0,    z_half),
+		origin + Vector3(x_near, y_top, -z_half),
+		origin + Vector3(x_near, y_top,  z_half),
+		origin + Vector3(x_far,  y_top, -z_half),
+		origin + Vector3(x_far,  y_top,  z_half),
 	]
 	var min_x := INF;  var min_y := INF
 	var max_x := -INF; var max_y := -INF
